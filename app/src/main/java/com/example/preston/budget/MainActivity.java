@@ -20,13 +20,22 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Arrays;
 import com.example.preston.budget.NeedsActivity;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
+    //FirebaseDatabase database = FirebaseDatabase.getInstance();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //DatabaseReference myRef = database.getReference("message");
+        //myRef.setValue("Hello, World!");
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
@@ -34,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         needs.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                needs.setText("clicked");
                 Intent launchNeeds = new Intent(v.getContext(), NeedsActivity.class);
                 startActivity(launchNeeds);
             }
@@ -47,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         wants.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                 wants.setText("clicked");
+                 return;
             }
         }
         );
