@@ -1,6 +1,8 @@
 package com.example.preston.budget;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -26,16 +28,24 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
-    //FirebaseDatabase database = FirebaseDatabase.getInstance();
-
+    FirebaseDatabase fb_database = FirebaseDatabase.getInstance();
+    SQLiteDatabase sql_db;
+    String db_name = "purchases";
+    int ADD_ITEM_RET_OK = 69;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //DatabaseReference myRef = database.getReference("message");
-        //myRef.setValue("Hello, World!");
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE,null);
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS P1(Price DOUBLE, Description VARCHAR);");
+        sql_db.execSQL("INSERT INTO P1 VALUES(2.50,'None');");
+
+        Cursor resultSet = sql_db.rawQuery("Select * from P1", null);
+        resultSet.moveToFirst();
+        Toast.makeText(this, resultSet.getString(0), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, resultSet.getString(1), Toast.LENGTH_LONG).show();
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
@@ -59,6 +69,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
+    }
+
+    public class purchase_item{
+        double price;
+        String description;
+        int year;
+        int month;
+        int day_of_month;
     }
 
 }

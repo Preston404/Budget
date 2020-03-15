@@ -4,7 +4,10 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,36 +30,50 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
  * Created by Preston on 3/4/2020.
  */
 
-public class NeedsActivity extends AppCompatActivity {
-    String[] needs_items = {"this", "that", "other"};
-    FragmentManager manager = getFragmentManager();
-    FragmentTransaction transaction;
+public class NeedsActivity extends MainActivity {
+    LinearLayout main_layout = null;
+    int next_id = 55;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.needs);
-
-        LinearLayout main = findViewById(R.id.needs_main);
-        TextView t = create_view(needs_items[0], 55);
-        main.addView(t);
+        main_layout = findViewById(R.id.needs_main);
 
         Button b = findViewById(R.id.needs_add_item);
         b.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                myFragment frag = new myFragment();
-                transaction = manager.beginTransaction();
-                transaction.replace(R.id.fragment_layout, frag);
-                transaction.addToBackStack(null);
-                transaction.commit();
+            Intent launchAddItem = new Intent(v.getContext(), AddItem.class);
+            int requested_code = 0;
+            startActivityForResult(launchAddItem, requested_code);
             }
         });
     }
 
-    TextView create_view(String title, int id){
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode != ADD_ITEM_RET_OK){
+            return;
+        }
+        double price = data.getExtras().getDouble("price");
+        String description = data.getExtras().getString("description");
+        TextView t = create_view(price, description, next_id);
+        main_layout.addView(t);
+        purchase_item item_to_add = new purchase_item();
+        next_id += 1;
+
+    }
+
+    TextView create_view(double price, String description, int id){
         TextView t = new TextView(this);
-        t.setText(title);
+        String text = String.format("$%.2f\n %s", price, description);
+        if (id % 2 == 0){
+            t.setBackgroundColor(Color.parseColor("#c0c0c0"));
+            Toast.makeText(this, "Setting background", Toast.LENGTH_LONG).show();
+        }
+        t.setText(text);
         t.setGravity(Gravity.CENTER);
         t.setTextSize(20);
         t.setId(id);
@@ -64,15 +81,4 @@ public class NeedsActivity extends AppCompatActivity {
         return t;
     }
 
-    public static class myFragment extends Fragment implements View.OnClickListener {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-            return inflater.inflate(R.layout.add_item, container, false);
-        }
-
-        @Override
-        public void onClick(View v){
-            Toast.makeText(v.getContext(), "Hello world", Toast.LENGTH_LONG).show();
-        }
-    }
 }

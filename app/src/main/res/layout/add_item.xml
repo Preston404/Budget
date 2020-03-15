@@ -43,6 +43,7 @@
         android:gravity="center"
         android:text="Submit"
         android:textSize="20pt"
+        android:id="@+id/submit_item"
         />
 
 </LinearLayout>
