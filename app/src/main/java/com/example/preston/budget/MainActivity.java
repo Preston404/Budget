@@ -19,8 +19,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.Locale;
+
 import com.example.preston.budget.NeedsActivity;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -29,8 +33,8 @@ import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity {
     FirebaseDatabase fb_database = FirebaseDatabase.getInstance();
-    SQLiteDatabase sql_db;
     String db_name = "purchases";
+    SQLiteDatabase sql_db;
     int ADD_ITEM_RET_OK = 69;
 
     @Override
@@ -39,13 +43,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE,null);
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS P1(Price DOUBLE, Description VARCHAR);");
-        sql_db.execSQL("INSERT INTO P1 VALUES(2.50,'None');");
+        sql_db.execSQL("DROP TABLE IF EXISTS t0;");
+        insert_purchase(3.50, "nessy");
+        insert_purchase(3.75, "loch");
+        insert_purchase(2.36, "monster");
+        get_all_purchases();
 
-        Cursor resultSet = sql_db.rawQuery("Select * from P1", null);
-        resultSet.moveToFirst();
-        Toast.makeText(this, resultSet.getString(0), Toast.LENGTH_LONG).show();
-        Toast.makeText(this, resultSet.getString(1), Toast.LENGTH_LONG).show();
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
@@ -71,12 +74,38 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
+    public void insert_purchase(double price, String description){
+
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date VARCHAR);");
+
+        long date_long = (new Date()).getTime();
+        String insert_cmd = String.format(Locale.US, "INSERT INTO t0 VALUES(%f, '%s', '%s');", price, description, Long.toString(date_long));
+        sql_db.execSQL(insert_cmd);
+
+        String date_string = (new Date(date_long)).toString();
+        String msg = String.format("Inserted purchase at: %s", date_string);
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
+
+    public void get_all_purchases(){
+        Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
+        resultSet.moveToFirst();
+        while(true){
+            String price = resultSet.getString(0);
+            String description = resultSet.getString(1);
+            String date = (new Date(Long.parseLong(resultSet.getString(2)))).toString();
+            String msg = String.format("Price: %s, Description: '%s', Date: '%s'", price, description, date);
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            if (resultSet.isLast()){
+                break;
+            }
+            resultSet.moveToNext();
+        }
+    }
+
     public class purchase_item{
-        double price;
-        String description;
-        int year;
-        int month;
-        int day_of_month;
+        double price = 0.69;
+        String description = "Not Set";
     }
 
 }
