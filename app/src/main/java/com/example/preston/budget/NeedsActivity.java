@@ -22,6 +22,8 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.text.AttributedCharacterIterator;
+import java.util.Date;
+import java.util.Vector;
 import java.util.jar.Attributes;
 
 import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.NULL;
@@ -32,13 +34,20 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
 
 public class NeedsActivity extends MainActivity {
     LinearLayout main_layout = null;
-    int next_id = 55;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.needs);
         main_layout = findViewById(R.id.needs_main);
+
+        Vector<purchase_item> needs = get_all_purchases();
+        while(needs != null && !needs.isEmpty()){
+            TextView t = create_view(needs.firstElement());
+            main_layout.addView(t);
+            needs.removeElementAt(0);
+
+        }
 
         Button b = findViewById(R.id.needs_add_item);
         b.setOnClickListener(new View.OnClickListener(){
@@ -59,26 +68,30 @@ public class NeedsActivity extends MainActivity {
         }
         double price = data.getExtras().getDouble("price");
         String description = data.getExtras().getString("description");
-        TextView t = create_view(price, description, next_id);
+        purchase_item p = new purchase_item(price, description, (new Date()).getTime());
+        TextView t = create_view(p);
         main_layout.addView(t);
-        purchase_item item_to_add = new purchase_item();
-        next_id += 1;
-
+        purchase_item item_to_insert = new purchase_item(price, description, (new Date()).getTime());
+        insert_purchase(item_to_insert);
+        String msg = "Purchase Saved";
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    TextView create_view(double price, String description, int id){
+    TextView create_view(purchase_item p){
         TextView t = new TextView(this);
-        String text = String.format("$%.2f\n %s", price, description);
-        if (id % 2 == 0){
+        String text = String.format("$%.2f\n %s", p.price, p.description);
+        if (next_id % 2 == 0){
             t.setBackgroundColor(Color.parseColor("#c0c0c0"));
-            Toast.makeText(this, "Setting background", Toast.LENGTH_LONG).show();
         }
+        next_id += 1;
         t.setText(text);
         t.setGravity(Gravity.CENTER);
         t.setTextSize(20);
-        t.setId(id);
+        t.setId(next_id);
         t.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
         return t;
     }
+
+
 
 }
