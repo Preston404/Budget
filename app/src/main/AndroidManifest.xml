@@ -27,6 +27,10 @@
             android:name=".AddItem"
             android:label="AddItem">
         </activity>
+        <activity
+            android:name=".EditItem"
+            android:label="EditItem">
+        </activity>
 
     </application>
 

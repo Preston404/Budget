@@ -36,7 +36,9 @@ public class MainActivity extends AppCompatActivity {
     String db_name = "purchases";
     SQLiteDatabase sql_db;
     int ADD_ITEM_RET_OK = 69;
-    int next_id = 55;
+    int EDIT_ITEM_RET_OK = 70;
+    int EDIT_ITEM_RET_DELETE = 71;
+    purchase_item last_purchase_clicked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
         sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE,null);
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date VARCHAR);");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER);");
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void insert_purchase(purchase_item p){
-        String insert_cmd = String.format(Locale.US, "INSERT INTO t0 VALUES(%f, '%s', '%s');", p.price, p.description, Long.toString(p.date));
+        String insert_cmd = String.format(Locale.US, "INSERT INTO t0 VALUES(%f, '%s', %d);", p.price, p.description, p.date);
         sql_db.execSQL(insert_cmd);
     }
 
@@ -87,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
             double price = Double.parseDouble(resultSet.getString(0));
             String description = resultSet.getString(1);
-            long date = Long.parseLong(resultSet.getString(2));
+            int date = Integer.parseInt(resultSet.getString(2));
             purchase_item p = new purchase_item(price, description, date);
             all_purchases.add(p);
             if (resultSet.isLast()){
@@ -98,12 +100,57 @@ public class MainActivity extends AppCompatActivity {
         return all_purchases;
     }
 
+    public boolean remove_purchase_by_id(int id){
+        Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
+        if(!resultSet.moveToFirst()){
+            return false;
+        }
+        while(true){
+            String date_string = resultSet.getString(2);
+            int date = Integer.parseInt(date_string);
+            if (date == id){
+                String cmd = String.format(Locale.US, "DELETE FROM t0 WHERE date = %d", date);
+                sql_db.execSQL(cmd);
+                Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            if (resultSet.isLast()){
+                break;
+            }
+            resultSet.moveToNext();
+        }
+        return false;
+    }
+
+    int get_seconds_from_ms(long ms){
+        long seconds = (ms / (long) 1000.0);
+        return (int) seconds;
+    }
+
+    purchase_item get_purchase_item_from_view(TextView v){
+        String description = "";
+        double price = 0;
+        try {
+            description = ((String) v.getText()).split("\\r?\\n")[1];
+            String first_line = ((String) v.getText()).split("\\r?\\n")[0];
+            String without_dollar_sign = first_line.substring(1);
+            price = Double.parseDouble(without_dollar_sign);
+        }
+        catch (Exception e){
+            String msg = String.format(Locale.US, "Parse failed on string '%s'", v.getText());
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        };
+        int id = v.getId();
+        purchase_item p = new purchase_item(price, description, id);
+        return p;
+    }
+
     public class purchase_item{
         double price = 0.69;
         String description = "Not Set";
-        long date = 0;
+        int date = 0;
 
-        purchase_item(double price, String description, long date){
+        purchase_item(double price, String description, int date){
             this.price = price;
             this.description = description;
             this.date = date;

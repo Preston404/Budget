@@ -5,6 +5,14 @@
     android:orientation="vertical"
     android:id="@+id/needs_main"
     >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20pt"
+        android:text="$0"
+        android:id="@+id/needs_view_total"
+        />
 
     <Button
         android:layout_width="match_parent"
