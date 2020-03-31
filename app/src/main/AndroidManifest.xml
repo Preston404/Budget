@@ -21,15 +21,18 @@
         </activity>
         <activity
             android:name=".NeedsActivity"
-            android:label="Needs">
+            android:label="Needs"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".AddItem"
-            android:label="AddItem">
+            android:label="AddItem"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".EditItem"
-            android:label="EditItem">
+            android:label="EditItem"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
     </application>

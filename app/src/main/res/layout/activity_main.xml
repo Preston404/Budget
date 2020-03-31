@@ -10,13 +10,53 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:textColor="@color/colorWhite"
         >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20pt"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorWhite"
+            android:text="Budget"
+            android:id="@+id/main_title"
+            />
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20pt"
+            android:background="@color/colorLightBlue"
+            android:textColor="@color/colorPrimaryDark"
+            android:text="REMAINING"
+            android:id="@+id/main_remaining_title"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20pt"
+            android:background="@color/colorWhite"
+            android:text="Amount: $0"
+            android:id="@+id/main_remaining_amount"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20pt"
+            android:background="@color/colorWhite"
+            android:text="Days: 0"
+            android:id="@+id/main_remaining_days"
+            />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="40pt"
+            android:textSize="20pt"
+            android:background="@color/colorLightBlue"
             android:text="Needs"
             android:id="@+id/needs"
             />
@@ -25,8 +65,9 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20pt"
-            android:text="Total this period: $0"
-            android:id="@+id/needs_this_period"
+            android:background="@color/colorWhite"
+            android:text="$0"
+            android:id="@+id/main_needs_amount"
             />
 
 
@@ -34,7 +75,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textSize="40pt"
+            android:textSize="20pt"
+            android:background="@color/colorLightBlue"
             android:text="Wants"
             android:id="@+id/wants"
             />
@@ -43,17 +85,9 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:textSize="20pt"
-            android:text="Wants this period: 0$"
-            android:id="@+id/wants_this_period"
-            />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:text="Days this period: 0"
-            android:id="@+id/days_this_period"
+            android:background="@color/colorWhite"
+            android:text="$0"
+            android:id="@+id/main_wants_amount"
             />
 
     </LinearLayout>

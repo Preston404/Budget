@@ -35,9 +35,10 @@ import com.google.firebase.storage.StorageReference;
 public class MainActivity extends AppCompatActivity {
     String db_name = "purchases";
     SQLiteDatabase sql_db;
-    int ADD_ITEM_RET_OK = 69;
-    int EDIT_ITEM_RET_OK = 70;
-    int EDIT_ITEM_RET_DELETE = 71;
+    final int ADD_ITEM_RET_OK = 69;
+    final int EDIT_ITEM_RET_OK = 70;
+    final int EDIT_ITEM_RET_DELETE = 71;
+    final int NEEDS_RET_OK = 72;
     purchase_item last_purchase_clicked;
 
     @Override
@@ -49,21 +50,22 @@ public class MainActivity extends AppCompatActivity {
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER);");
 
+        TextView main_title = findViewById(R.id.main_title);
+        main_title.setPaintFlags(main_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
-        needs.setPaintFlags(needs.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         needs.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
                 Intent launchNeeds = new Intent(v.getContext(), NeedsActivity.class);
-                startActivity(launchNeeds);
+                startActivityForResult(launchNeeds, NEEDS_RET_OK);
             }
         }
         );
 
         // Stuff for "wants"
         final TextView wants = findViewById(R.id.wants);
-        wants.setPaintFlags(wants.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         wants.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -71,6 +73,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == NEEDS_RET_OK) {
+            double total = data.getExtras().getDouble("total");
+            String text = String.format(Locale.US, "$%.2f", total);
+            ((TextView) findViewById(R.id.main_needs_amount)).setText(text);
+        }
     }
 
     public void insert_purchase(purchase_item p){

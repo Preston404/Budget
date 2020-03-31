@@ -16,7 +16,7 @@ import java.util.Locale;
  * Created by Preston on 3/15/2020.
  */
 
-public class EditItem extends MainActivity {
+public class EditItem extends AppCompatActivity {
     EditText item_price_edit_text;
     EditText item_description_edit_text;
 
