@@ -6,119 +6,127 @@
     android:layout_height="match_parent"
     tools:context="com.example.preston.budget.MainActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:textColor="@color/colorWhite"
-        >
-        <TextView
+        android:layout_height="match_parent">
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorPrimary"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:textColor="@color/colorWhite"
-            android:text="Budget"
-            android:id="@+id/main_title"
-            />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorLightBlue"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="Monthly Goals"
-            android:id="@+id/main_monthly_budget_title"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
             android:background="@color/colorWhite"
-            android:text="Amount: $800"
-            android:id="@+id/main_monthly_budget_amount"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorWhite"
-            android:text="Start: 25th"
-            android:id="@+id/main_monthly_budget_start_day"
-            />
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorLightBlue"
-            android:textColor="@color/colorPrimaryDark"
-            android:text="REMAINING"
-            android:id="@+id/main_remaining_title"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorWhite"
-            android:text="Amount: $0"
-            android:id="@+id/main_remaining_amount"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorWhite"
-            android:text="Days: 0"
-            android:id="@+id/main_remaining_days"
-            />
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/colorWhite"
+                android:text="Budget"
+                android:id="@+id/main_title"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="REMAINING"
+                android:id="@+id/main_remaining_title"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="Amount: $0"
+                android:id="@+id/main_remaining_amount"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="Days: 0"
+                android:id="@+id/main_remaining_days"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_margin="@dimen/button_margin"
+                android:text="Monthly Goals"
+                android:id="@+id/main_monthly_budget_title"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="Amount: $800"
+                android:id="@+id/main_monthly_budget_amount"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="Start: 25th"
+                android:id="@+id/main_monthly_budget_start_day"
+                />
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorLightBlue"
-            android:text="Needs"
-            android:id="@+id/needs"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorWhite"
-            android:text="$0"
-            android:id="@+id/main_needs_amount"
-            />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:layout_margin="@dimen/button_margin"
+                android:text="Needs"
+                android:id="@+id/needs"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="$0"
+                android:id="@+id/main_needs_amount"
+                />
 
 
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorLightBlue"
-            android:text="Wants"
-            android:id="@+id/wants"
-            />
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="20pt"
-            android:background="@color/colorWhite"
-            android:text="$0"
-            android:id="@+id/main_wants_amount"
-            />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:layout_margin="@dimen/button_margin"
+                android:text="Wants"
+                android:id="@+id/wants"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorWhite"
+                android:text="$0"
+                android:id="@+id/main_wants_amount"
+                />
 
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
     <!--
 
     -->

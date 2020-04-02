@@ -34,6 +34,11 @@
             android:label="EditItem"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".EditGoal"
+            android:label="EditGoal"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
     </application>
 

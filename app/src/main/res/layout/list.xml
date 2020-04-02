@@ -3,7 +3,9 @@
 <LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/colorWhite"
+    >
 
     <ScrollView
         android:layout_width="fill_parent"
@@ -40,8 +42,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="20pt"
-                android:background="@color/colorPrimary"
-                android:textColor="@color/colorWhite"
+                android:background="@color/colorLightBlue"
+                android:layout_margin="@dimen/button_margin"
                 android:text="Add Purchase"
                 android:id="@+id/list_add_item"
                 />

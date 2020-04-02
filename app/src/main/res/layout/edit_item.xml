@@ -4,11 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/edit_item"
+    android:background="@color/colorWhite"
     >
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorWhite"
+        android:id="@+id/edit_item_title"
+        android:text="Purchase"
+        android:textSize="20pt"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/colorLightBlue"
         android:text="Price"
         android:textSize="20pt"
         />
@@ -21,10 +33,11 @@
         android:id="@+id/edit_item_price"
         />
 
-    <TextView
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorLightBlue"
         android:text="Description"
         android:textSize="20pt"
         />
@@ -41,6 +54,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorLightGreen"
+        android:layout_margin="@dimen/button_margin"
         android:text="Submit"
         android:textSize="20pt"
         android:id="@+id/edit_submit_item"
@@ -49,6 +64,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_margin="@dimen/button_margin"
+        android:background="@color/colorLightRed"
         android:text="Delete"
         android:textSize="20pt"
         android:id="@+id/edit_delete_item"

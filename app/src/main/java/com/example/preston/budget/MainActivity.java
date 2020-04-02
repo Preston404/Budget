@@ -40,15 +40,17 @@ public class MainActivity extends AppCompatActivity {
     final int ALL_PURCHASES = 0;
     final int NEEDS_ONLY = 1;
     final int WANTS_ONLY = 2;
+
     final int ADD_ITEM_RET_OK = 69;
     final int EDIT_ITEM_RET_OK = 70;
     final int EDIT_ITEM_RET_DELETE = 71;
     final int NEEDS_RET_OK = 72;
     final int WANTS_RET_OK = 73;
+    final int EDIT_GOAL_RET_OK = 74;
+
+
     purchase_item last_purchase_clicked;
     int needs = 1;
-    double monthly_budget_amount = 800;
-    int monthly_budget_start_day = 25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,16 @@ public class MainActivity extends AppCompatActivity {
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");
 
-        init_textviews();
+        update_textviews();
+
+        final TextView goals = findViewById(R.id.main_monthly_budget_title);
+        goals.setOnClickListener(new View.OnClickListener(){
+                                     @Override
+                                     public void onClick(View v){
+                                         Intent launchWants = new Intent(v.getContext(), EditGoal.class);
+                                         startActivityForResult(launchWants, EDIT_GOAL_RET_OK);}
+                                 }
+        );
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
@@ -80,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                                      public void onClick(View v){
                 Intent launchWants = new Intent(v.getContext(), ListActivity.class);
                 launchWants.putExtra("needs", 0);
-                startActivityForResult(launchWants, NEEDS_RET_OK);}
+                startActivityForResult(launchWants, WANTS_RET_OK);}
                                  }
         );
     }
@@ -92,24 +103,35 @@ public class MainActivity extends AppCompatActivity {
             double total = data.getExtras().getDouble("total");
             String text = String.format(Locale.US, "$%.2f", total);
             ((TextView) findViewById(R.id.main_needs_amount)).setText(text);
+            update_textviews();
         }
-        if (resultCode == WANTS_RET_OK) {
+        else if (resultCode == WANTS_RET_OK) {
             double total = data.getExtras().getDouble("total");
             String text = String.format(Locale.US, "$%.2f", total);
             ((TextView) findViewById(R.id.main_wants_amount)).setText(text);
+            update_textviews();
+        }
+        else if (requestCode == EDIT_GOAL_RET_OK){
+            update_textviews();
         }
     }
 
-    public void init_textviews(){
+    public void update_textviews(){
 
         TextView main_title = findViewById(R.id.main_title);
         main_title.setPaintFlags(main_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
+        goal_config c = read_goal_config_from_db();
+        if (c != null){
+            set_main_monthly_goal_amount(c.monthly_goal_amount);
+            set_main_monthly_start_day(c.start_day);
+        }
+
         TextView needs_total = findViewById(R.id.main_needs_amount);
-        needs_total.setText(get_total_text(get_total_spent(NEEDS_ONLY)));
+        needs_total.setText(get_list_total_string(get_total_spent(NEEDS_ONLY)));
 
         TextView wants_total = findViewById(R.id.main_wants_amount);
-        wants_total.setText(get_total_text(get_total_spent(WANTS_ONLY)));
+        wants_total.setText(get_list_total_string(get_total_spent(WANTS_ONLY)));
 
         double goal_amount = get_main_monthly_goal_amount();
         double spent = get_total_spent(ALL_PURCHASES);
@@ -118,8 +140,27 @@ public class MainActivity extends AppCompatActivity {
         int days_remaining = get_days_until_day_of_month(get_main_monthly_start_day());
         set_main_remaining_days(days_remaining);
 
-
     }
+
+    public void insert_config_into_db(goal_config c){
+        // Always overwrite the previous table
+        sql_db.execSQL("DROP TABLE IF EXISTS c0;");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
+        String insert_cmd = String.format(Locale.US, "INSERT INTO c0 VALUES(%.2f, %d);", c.monthly_goal_amount, c.start_day);
+        sql_db.execSQL(insert_cmd);
+    }
+
+    public goal_config read_goal_config_from_db(){
+        Cursor resultSet = sql_db.rawQuery("Select * from c0", null);
+        if(!resultSet.moveToFirst()){
+            return null;
+        }
+        double monthly_goal_amount  = Double.parseDouble(resultSet.getString(0));
+        int start_day = Integer.parseInt(resultSet.getString(1));
+        goal_config c = new goal_config(monthly_goal_amount, start_day);
+        return c;
+    }
+
 
     public void insert_purchase(purchase_item p){
         String insert_cmd = String.format(Locale.US, "INSERT INTO t0 VALUES(%f, '%s', %d, %d);", p.price, p.description, p.date, p.need);
@@ -161,7 +202,6 @@ public class MainActivity extends AppCompatActivity {
             if (date == id){
                 String cmd = String.format(Locale.US, "DELETE FROM t0 WHERE date = %d", date);
                 sql_db.execSQL(cmd);
-                Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
                 return true;
             }
             if (resultSet.isLast()){
@@ -214,15 +254,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public class goal_config{
+        double monthly_goal_amount = 0.0;
+        int start_day = 25;
+        goal_config(double monthly_goal_amount, int start_day){
+            this.monthly_goal_amount = monthly_goal_amount;
+            this.start_day = start_day;
+        }
+    }
+
     double get_main_monthly_goal_amount(){
         TextView t = findViewById(R.id.main_monthly_budget_amount);
         return Double.parseDouble(t.getText().toString().split(" ")[1].substring(1));
     }
 
+    void set_main_monthly_goal_amount(double d){
+        TextView t = findViewById(R.id.main_monthly_budget_amount);
+        t.setText(get_monthly_goal_amount_string(d));
+    }
+
     int get_main_monthly_start_day(){
         TextView t = findViewById(R.id.main_monthly_budget_start_day);
-        String s = t.getText().toString().split(" ")[1];
+        String s = t.getText().toString().split(" ")[2];
         return Integer.parseInt(s.substring(0, s.length()-2));
+    }
+
+    void set_main_monthly_start_day(int day){
+        TextView t = findViewById(R.id.main_monthly_budget_start_day);
+        t.setText(get_monthly_start_day_string(day));
     }
 
     void set_main_remaining_amount(double amount){
@@ -252,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
         return (int) seconds;
     }
 
-    String get_total_text(double d){
-        return String.format(Locale.US,"$%.2f", d);
-    }
+    String get_list_total_string(double d){return String.format(Locale.US,"$%.2f", d);}
+    String get_monthly_start_day_string(int day){return String.format(Locale.US,"Start Day: %dth", day);}
+    String get_monthly_goal_amount_string(double amount){return String.format(Locale.US,"Amount: $%.2f", amount);}
 }

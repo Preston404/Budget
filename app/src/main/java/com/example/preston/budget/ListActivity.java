@@ -56,8 +56,6 @@ public class ListActivity extends MainActivity {
         draw_list_screen();
 
         Button b = findViewById(R.id.list_add_item);
-        b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-        b.setTextColor(getResources().getColor(R.color.colorWhite));
         b.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -90,11 +88,13 @@ public class ListActivity extends MainActivity {
             insert_purchase(p);
             TextView t = findViewById(id);
             t.setText(get_purchase_text(p));
+            Toast.makeText(this, "Purchase Edited", Toast.LENGTH_SHORT).show();
         }
         else if (resultCode == EDIT_ITEM_RET_DELETE){
             TextView t = findViewById(last_purchase_clicked.date);
             remove_purchase_by_id(t.getId());
             ((ViewGroup) t.getParent()).removeView(t);
+            Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
         }
         update_background();
         update_total();
@@ -139,7 +139,7 @@ public class ListActivity extends MainActivity {
             total += list_items.get(0).price;
             list_items.removeElementAt(0);
         }
-        ((TextView) findViewById(R.id.list_view_total)).setText(get_total_text(total));
+        ((TextView) findViewById(R.id.list_view_total)).setText(get_list_total_string(total));
         update_background();
     }
 
@@ -147,7 +147,7 @@ public class ListActivity extends MainActivity {
         Vector<TextView> tvs = get_purchase_textviews();
         int i = 0;
         while(!tvs.isEmpty()){
-            if (i % 2 == 0) {
+            if (i % 2 != 0) {
                 tvs.get(0).setBackgroundColor(getResources().getColor(R.color.colorLightBlue));
             }
             else{
@@ -160,12 +160,12 @@ public class ListActivity extends MainActivity {
 
     void update_total(){
         Vector<TextView> tvs = get_purchase_textviews();
-        int total = 0;
+        double total = 0;
         while(!tvs.isEmpty()) {
             total += get_purchase_item_from_view(tvs.get(0)).price;
             tvs.remove(0);
         }
-        ((TextView) findViewById(R.id.list_view_total)).setText(get_total_text(total));
+        ((TextView) findViewById(R.id.list_view_total)).setText(get_list_total_string(total));
     }
 
     Vector<TextView> get_purchase_textviews(){

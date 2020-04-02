@@ -4,11 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/add_item"
+    android:background="@color/colorWhite"
     >
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:id="@+id/add_item_title"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorWhite"
+        android:text="Purchase"
+        android:textSize="20pt"
+        />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/colorLightBlue"
         android:text="Price"
         android:textSize="20pt"
         />
@@ -21,10 +34,11 @@
         android:id="@+id/item_price"
         />
 
-    <TextView
+    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorLightBlue"
         android:text="Description"
         android:textSize="20pt"
         />
@@ -41,6 +55,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorLightGreen"
+        android:layout_margin="@dimen/button_margin"
         android:text="Submit"
         android:textSize="20pt"
         android:id="@+id/submit_item"
