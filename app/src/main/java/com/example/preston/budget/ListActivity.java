@@ -37,22 +37,25 @@ import static com.google.android.gms.common.internal.safeparcel.SafeParcelable.N
  * Created by Preston on 3/4/2020.
  */
 
-public class NeedsActivity extends MainActivity {
+public class ListActivity extends MainActivity {
     LinearLayout main_layout = null;
-    final Integer[] static_views = new Integer[]{R.id.needs_view_total, R.id.needs_add_item, R.id.needs_title};
+    final Integer[] static_views = new Integer[]{R.id.list_view_total, R.id.list_add_item, R.id.list_title};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.needs);
-        main_layout = findViewById(R.id.needs_main);
+        setContentView(R.layout.list);
+        main_layout = findViewById(R.id.list_main);
+        needs = getIntent().getExtras().getInt("needs");
 
-        TextView needs_title = findViewById(R.id.needs_title);
-        needs_title.setPaintFlags(needs_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        TextView list_title = findViewById(R.id.list_title);
+        list_title.setPaintFlags(list_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        if (needs == 1){list_title.setText("Needs");}
+        else{list_title.setText("Wants");}
 
-        draw_needs_screen();
+        draw_list_screen();
 
-        Button b = findViewById(R.id.needs_add_item);
+        Button b = findViewById(R.id.list_add_item);
         b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         b.setTextColor(getResources().getColor(R.color.colorWhite));
         b.setOnClickListener(new View.OnClickListener(){
@@ -73,7 +76,7 @@ public class NeedsActivity extends MainActivity {
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
             int date = get_seconds_from_ms((new Date()).getTime());
-            purchase_item p = new purchase_item(price, description, date);
+            purchase_item p = new purchase_item(price, description, date, needs);
             insert_purchase(p);
             main_layout.addView(create_purchase_view(p));
             Toast.makeText(this, "Purchase Saved", Toast.LENGTH_SHORT).show();
@@ -83,7 +86,7 @@ public class NeedsActivity extends MainActivity {
             remove_purchase_by_id(id);
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
-            purchase_item p = new purchase_item(price, description, id);
+            purchase_item p = new purchase_item(price, description, id, needs);
             insert_purchase(p);
             TextView t = findViewById(id);
             t.setText(get_purchase_text(p));
@@ -100,9 +103,10 @@ public class NeedsActivity extends MainActivity {
     @Override
     public void onBackPressed(){
         Intent intent = new Intent();
-        double total = Double.parseDouble(((TextView) findViewById(R.id.needs_view_total)).getText().toString().substring(1));
+        double total = Double.parseDouble(((TextView) findViewById(R.id.list_view_total)).getText().toString().substring(1));
         intent.putExtra("total", total);
-        setResult(72, intent);
+        int resultCode = (needs == 1) ? NEEDS_RET_OK : WANTS_RET_OK;
+        setResult(resultCode, intent);
         finish();
         super.onBackPressed();
     }
@@ -119,7 +123,7 @@ public class NeedsActivity extends MainActivity {
         return t;
     }
 
-    void draw_needs_screen(){
+    void draw_list_screen(){
         Vector<TextView> tvs = get_purchase_textviews();
         while(!tvs.isEmpty()){
             ((ViewGroup) tvs.get(0).getParent()).removeView(tvs.get(0));
@@ -127,14 +131,15 @@ public class NeedsActivity extends MainActivity {
         }
 
         double total = 0;
-        Vector<purchase_item> needs = get_all_purchases();
-        while(!needs.isEmpty()){
-            TextView t = create_purchase_view(needs.get(0));
+        int filter = (needs == 1) ? NEEDS_ONLY : WANTS_ONLY;
+        Vector<purchase_item> list_items = get_all_purchases(filter);
+        while(list_items != null && !list_items.isEmpty()){
+            TextView t = create_purchase_view(list_items.get(0));
             main_layout.addView(t);
-            total += needs.get(0).price;
-            needs.removeElementAt(0);
+            total += list_items.get(0).price;
+            list_items.removeElementAt(0);
         }
-        ((TextView) findViewById(R.id.needs_view_total)).setText(get_total_text(total));
+        ((TextView) findViewById(R.id.list_view_total)).setText(get_total_text(total));
         update_background();
     }
 
@@ -160,7 +165,7 @@ public class NeedsActivity extends MainActivity {
             total += get_purchase_item_from_view(tvs.get(0)).price;
             tvs.remove(0);
         }
-        ((TextView) findViewById(R.id.needs_view_total)).setText(get_total_text(total));
+        ((TextView) findViewById(R.id.list_view_total)).setText(get_total_text(total));
     }
 
     Vector<TextView> get_purchase_textviews(){
@@ -178,11 +183,7 @@ public class NeedsActivity extends MainActivity {
     }
 
     String get_purchase_text(purchase_item p){
-        return String.format(Locale.US, "$%.2f\n %s", p.price, p.description);
-    }
-
-    String get_total_text(double d){
-        return String.format(Locale.US,"$%.2f", d);
+        return String.format(Locale.US, "$%.2f\n%s", p.price, p.description);
     }
 
     View.OnClickListener purchase_clicked = new View.OnClickListener(){

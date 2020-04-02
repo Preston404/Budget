@@ -20,8 +20,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NeedsActivity"
-            android:label="Needs"
+            android:name=".ListActivity"
+            android:label="List"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
