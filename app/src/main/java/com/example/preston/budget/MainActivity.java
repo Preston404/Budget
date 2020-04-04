@@ -61,6 +61,10 @@ public class MainActivity extends AppCompatActivity {
         sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE,null);
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
+        if (read_goal_config_from_db() == null){
+            goal_config c = new goal_config(800,25);
+        }
 
         update_textviews();
 
