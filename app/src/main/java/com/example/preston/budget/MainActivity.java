@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
@@ -306,9 +307,50 @@ public class MainActivity extends AppCompatActivity {
         return day_difference;
     }
 
+    int get_days_since_day_of_month(int day_of_month){
+        long old_date = (new Date()).getTime();
+        while ((new Date(old_date)).getDate() != day_of_month){
+            old_date -= 60*60*24*1000;
+        };
+        long ms_difference = (new Date()).getTime() - old_date;
+        int day_difference = (int) (ms_difference / (60*60*24*1000));
+        return day_difference;
+    }
+
     int get_seconds_from_ms(long ms){
         long seconds = (ms / (long) 1000.0);
         return (int) seconds;
+    }
+
+    Vector<purchase_item> sort_purchases_newest_first(Vector<purchase_item> purchases){
+        if (purchases == null){return null;}
+        boolean sorted = false;
+        while(!sorted) {
+            sorted = true;
+            for (int i = 0; i < purchases.size() - 1; i++) {
+                if (purchases.elementAt(i).date < purchases.elementAt(i + 1).date) {
+                    Collections.swap(purchases, i, i + 1);
+                    sorted = false;
+                }
+            }
+        }
+        return purchases;
+    }
+
+    Vector<purchase_item> filter_purchases_this_period(Vector<purchase_item> purchases){
+        if (purchases == null){return null;}
+        Vector<purchase_item> purchases_this_month = new Vector<>();
+        goal_config c = read_goal_config_from_db();
+        Date d = new Date();
+        int days_since_start = get_days_since_day_of_month(c.start_day);
+        int seconds_since_start = days_since_start*24*60*60;
+        for (int i = 0; i < purchases.size(); i++) {
+            if(purchases.elementAt(i).date - get_seconds_from_ms(d.getTime()) < seconds_since_start){
+                purchases_this_month.add(purchases.elementAt(i));
+            }
+        }
+        if (purchases_this_month.size() == 0){return null;}
+        return purchases;
     }
 
     String get_list_total_string(double d){return String.format(Locale.US,"$%.2f", d);}

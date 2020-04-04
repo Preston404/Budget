@@ -76,7 +76,8 @@ public class ListActivity extends MainActivity {
             int date = get_seconds_from_ms((new Date()).getTime());
             purchase_item p = new purchase_item(price, description, date, needs);
             insert_purchase(p);
-            main_layout.addView(create_purchase_view(p));
+            int index = 3;
+            main_layout.addView(create_purchase_view(p), index);
             Toast.makeText(this, "Purchase Saved", Toast.LENGTH_SHORT).show();
         }
         else if (resultCode == EDIT_ITEM_RET_OK){
@@ -124,20 +125,23 @@ public class ListActivity extends MainActivity {
     }
 
     void draw_list_screen(){
-        Vector<TextView> tvs = get_purchase_textviews();
-        while(!tvs.isEmpty()){
-            ((ViewGroup) tvs.get(0).getParent()).removeView(tvs.get(0));
-            tvs.remove(0);
+        Vector<TextView> textviews = get_purchase_textviews();
+        while(!textviews.isEmpty()){
+            ((ViewGroup) textviews.get(0).getParent()).removeView(textviews.get(0));
+            textviews.remove(0);
         }
 
         double total = 0;
         int filter = (needs == 1) ? NEEDS_ONLY : WANTS_ONLY;
-        Vector<purchase_item> list_items = get_all_purchases(filter);
-        while(list_items != null && !list_items.isEmpty()){
-            TextView t = create_purchase_view(list_items.get(0));
+        Vector<purchase_item> purchase_items = get_all_purchases(filter);
+        purchase_items = sort_purchases_newest_first(purchase_items);
+        purchase_items = filter_purchases_this_period(purchase_items);
+
+        while(purchase_items != null && !purchase_items.isEmpty()){
+            TextView t = create_purchase_view(purchase_items.get(0));
             main_layout.addView(t);
-            total += list_items.get(0).price;
-            list_items.removeElementAt(0);
+            total += purchase_items.get(0).price;
+            purchase_items.removeElementAt(0);
         }
         ((TextView) findViewById(R.id.list_view_total)).setText(get_list_total_string(total));
         update_background();
