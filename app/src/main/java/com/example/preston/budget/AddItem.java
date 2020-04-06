@@ -14,6 +14,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Date;
+import java.util.Locale;
+
 /**
  * Created by Preston on 3/15/2020.
  */
@@ -49,6 +52,9 @@ public class AddItem extends MainActivity {
                     return;
                 }
                 Intent intent = new Intent();
+                String[] d_array = (new Date()).toString().split("\\s+");
+                String d =  d_array[1] + " " + d_array[2];
+                description = String.format(Locale.US, "%s: %s", d, description);
                 intent.putExtra("price",price);
                 intent.putExtra("description",description);
                 setResult(ADD_ITEM_RET_OK, intent);

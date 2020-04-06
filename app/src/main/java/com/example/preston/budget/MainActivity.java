@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     final int ALL_PURCHASES = 0;
     final int NEEDS_ONLY = 1;
     final int WANTS_ONLY = 2;
+    final int PERIODS_THIS = 0;
 
     final int ADD_ITEM_RET_OK = 69;
     final int EDIT_ITEM_RET_OK = 70;
@@ -62,9 +63,6 @@ public class MainActivity extends AppCompatActivity {
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
-        if (read_goal_config_from_db() == null){
-            goal_config c = new goal_config(800,25);
-        }
 
         update_textviews();
 
@@ -127,22 +125,21 @@ public class MainActivity extends AppCompatActivity {
         main_title.setPaintFlags(main_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         goal_config c = read_goal_config_from_db();
-        if (c != null){
-            set_main_monthly_goal_amount(c.monthly_goal_amount);
-            set_main_monthly_start_day(c.start_day);
-        }
+
+        set_main_monthly_goal_amount(c.monthly_goal_amount);
+        set_main_monthly_start_day(c.start_day);
+
 
         TextView needs_total = findViewById(R.id.main_needs_amount);
-        needs_total.setText(get_list_total_string(get_total_spent(NEEDS_ONLY)));
+        needs_total.setText(get_list_total_string(get_total_spent(NEEDS_ONLY, PERIODS_THIS)));
 
         TextView wants_total = findViewById(R.id.main_wants_amount);
-        wants_total.setText(get_list_total_string(get_total_spent(WANTS_ONLY)));
+        wants_total.setText(get_list_total_string(get_total_spent(WANTS_ONLY, PERIODS_THIS)));
 
-        double goal_amount = get_main_monthly_goal_amount();
-        double spent = get_total_spent(ALL_PURCHASES);
-        set_main_remaining_amount(goal_amount - spent);
+        double spent = get_total_spent(ALL_PURCHASES, PERIODS_THIS);
+        set_main_remaining_amount(c.monthly_goal_amount - spent);
 
-        int days_remaining = get_days_until_day_of_month(get_main_monthly_start_day());
+        int days_remaining = get_days_until_day_of_month(c.start_day);
         set_main_remaining_days(days_remaining);
 
     }
@@ -158,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
     public goal_config read_goal_config_from_db(){
         Cursor resultSet = sql_db.rawQuery("Select * from c0", null);
         if(!resultSet.moveToFirst()){
-            return null;
+            goal_config c = new goal_config(800,25);
+            return c;
         }
         double monthly_goal_amount  = Double.parseDouble(resultSet.getString(0));
         int start_day = Integer.parseInt(resultSet.getString(1));
@@ -235,8 +233,11 @@ public class MainActivity extends AppCompatActivity {
         return p;
     }
 
-    double get_total_spent(int filter){
+    double get_total_spent(int filter, int period){
         Vector<purchase_item> purchases = get_all_purchases(filter);
+        if (period == PERIODS_THIS){
+            purchases = filter_purchases_this_period(purchases);
+        }
         double total = 0;
         while(purchases != null && !purchases.isEmpty()){
             total += purchases.get(0).price;
@@ -268,20 +269,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    double get_main_monthly_goal_amount(){
-        TextView t = findViewById(R.id.main_monthly_budget_amount);
-        return Double.parseDouble(t.getText().toString().split(" ")[1].substring(1));
-    }
-
     void set_main_monthly_goal_amount(double d){
         TextView t = findViewById(R.id.main_monthly_budget_amount);
         t.setText(get_monthly_goal_amount_string(d));
-    }
-
-    int get_main_monthly_start_day(){
-        TextView t = findViewById(R.id.main_monthly_budget_start_day);
-        String s = t.getText().toString().split(" ")[2];
-        return Integer.parseInt(s.substring(0, s.length()-2));
     }
 
     void set_main_monthly_start_day(int day){
