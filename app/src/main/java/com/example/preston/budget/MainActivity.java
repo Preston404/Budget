@@ -339,12 +339,12 @@ public class MainActivity extends AppCompatActivity {
         int days_since_start = get_days_since_day_of_month(c.start_day);
         int seconds_since_start = days_since_start*24*60*60;
         for (int i = 0; i < purchases.size(); i++) {
-            if(purchases.elementAt(i).date - get_seconds_from_ms(d.getTime()) < seconds_since_start){
+            if((get_seconds_from_ms(d.getTime()) - purchases.elementAt(i).date) < seconds_since_start){
                 purchases_this_month.add(purchases.elementAt(i));
             }
         }
         if (purchases_this_month.size() == 0){return null;}
-        return purchases;
+        return purchases_this_month;
     }
 
     String get_list_total_string(double d){return String.format(Locale.US,"$%.2f", d);}
