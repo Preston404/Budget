@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     int get_days_until_day_of_month(int day_of_month){
-        long new_date = (new Date()).getTime();
+        long new_date = (new Date()).getTime() + 60*60*24*1000; // Tomorrow
         while ((new Date(new_date)).getDate() != day_of_month){
             new_date += 60*60*24*1000;
         };
@@ -303,6 +303,7 @@ public class MainActivity extends AppCompatActivity {
 
     int get_days_since_day_of_month(int day_of_month){
         long old_date = (new Date()).getTime();
+
         while ((new Date(old_date)).getDate() != day_of_month){
             old_date -= 60*60*24*1000;
         };
@@ -335,14 +336,17 @@ public class MainActivity extends AppCompatActivity {
         if (purchases == null){return null;}
         Vector<purchase_item> purchases_this_month = new Vector<>();
         goal_config c = read_goal_config_from_db();
+        int seconds_today = ((new Date()).getHours()*3600) + ((new Date()).getMinutes()*60);
         Date d = new Date();
         int days_since_start = get_days_since_day_of_month(c.start_day);
-        int seconds_since_start = days_since_start*24*60*60;
+        int seconds_since_start = days_since_start*24*60*60 + seconds_today;
         for (int i = 0; i < purchases.size(); i++) {
             if((get_seconds_from_ms(d.getTime()) - purchases.elementAt(i).date) < seconds_since_start){
                 purchases_this_month.add(purchases.elementAt(i));
             }
         }
+        //String msg = String.format(Locale.US, "Seconds today %d", seconds_today);
+        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         if (purchases_this_month.size() == 0){return null;}
         return purchases_this_month;
     }
