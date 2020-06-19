@@ -21,7 +21,8 @@ import java.util.Locale;
  * Created by Preston on 3/15/2020.
  */
 
-public class AddItem extends MainActivity {
+public class AddItem extends MainActivity
+{
     EditText item_price_edit_text = null;
     EditText item_description_edit_text = null;
     double price = 0.0;
@@ -29,7 +30,8 @@ public class AddItem extends MainActivity {
     Context context = this;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_item);
 
@@ -41,13 +43,18 @@ public class AddItem extends MainActivity {
 
         Button b = findViewById(R.id.submit_item);
 
-        b.setOnClickListener(new View.OnClickListener(){
+        b.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v){
-                try {
+            public void onClick(View v)
+            {
+                try
+                {
                     price = Float.parseFloat(((EditText) item_price_edit_text).getText().toString());
                     description = ((EditText) item_description_edit_text).getText().toString();
-                }catch(Exception e){
+                }
+                catch(Exception e)
+                {
                     Toast.makeText(context, "Invalid Entry", Toast.LENGTH_SHORT).show();
                     return;
                 }

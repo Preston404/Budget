@@ -35,13 +35,23 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+{
     String db_name = "purchases";
     SQLiteDatabase sql_db;
-    final int ALL_PURCHASES = 0;
-    final int NEEDS_ONLY = 1;
-    final int WANTS_ONLY = 2;
+
+    final int ms_in_a_day = 60*60*24*1000;
+    final int seconds_in_a_day = 60*60*24;
+
+    final int FILTER_ALL = 2;
+    final int FILTER_NEEDS_ONLY = 0;
+    final int FILTER_WANTS_ONLY = 1;
+
     final int PERIODS_THIS = 0;
+
+    final int NEEDS_LIST_VIEW = FILTER_NEEDS_ONLY;
+    final int WANTS_LIST_VIEW = FILTER_WANTS_ONLY;
+    final int ALL_LIST_VIEW = FILTER_ALL;
 
     final int ADD_ITEM_RET_OK = 69;
     final int EDIT_ITEM_RET_OK = 70;
@@ -49,13 +59,18 @@ public class MainActivity extends AppCompatActivity {
     final int NEEDS_RET_OK = 72;
     final int WANTS_RET_OK = 73;
     final int EDIT_GOAL_RET_OK = 74;
+    final int ALL_RET_OK = 75;
 
 
     purchase_item last_purchase_clicked;
-    int needs = 1;
+    int IS_A_NEED = FILTER_NEEDS_ONLY;
+    int IS_NOT_A_NEED = FILTER_WANTS_ONLY;
+    int list_view_type = FILTER_NEEDS_ONLY;
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -67,60 +82,92 @@ public class MainActivity extends AppCompatActivity {
         update_textviews();
 
         final TextView goals = findViewById(R.id.main_monthly_budget_title);
-        goals.setOnClickListener(new View.OnClickListener(){
-                                     @Override
-                                     public void onClick(View v){
-                                         Intent launchWants = new Intent(v.getContext(), EditGoal.class);
-                                         startActivityForResult(launchWants, EDIT_GOAL_RET_OK);}
-                                 }
+        goals.setOnClickListener(
+            new View.OnClickListener()
+            {
+                 @Override
+                 public void onClick(View v)
+                 {
+                     Intent launchWants = new Intent(v.getContext(), EditGoal.class);
+                     startActivityForResult(launchWants, EDIT_GOAL_RET_OK);
+                 }
+            }
         );
 
         // Stuff for "needs"
         final TextView needs = findViewById(R.id.needs);
-        needs.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Intent launchNeeds = new Intent(v.getContext(), ListActivity.class);
-                launchNeeds.putExtra("needs", 1);
-                startActivityForResult(launchNeeds, NEEDS_RET_OK);
+        needs.setOnClickListener(
+            new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Intent launchNeeds = new Intent(v.getContext(), ListActivity.class);
+                    launchNeeds.putExtra("list_view_type", NEEDS_LIST_VIEW);
+                    startActivityForResult(launchNeeds, NEEDS_RET_OK);
+                }
             }
-        }
         );
 
         // Stuff for "wants"
         final TextView wants = findViewById(R.id.wants);
-        wants.setOnClickListener(new View.OnClickListener(){
-                                     @Override
-                                     public void onClick(View v){
-                Intent launchWants = new Intent(v.getContext(), ListActivity.class);
-                launchWants.putExtra("needs", 0);
-                startActivityForResult(launchWants, WANTS_RET_OK);}
-                                 }
+        wants.setOnClickListener(
+            new View.OnClickListener()
+            {
+                 @Override
+                 public void onClick(View v)
+                 {
+                    Intent launchWants = new Intent(v.getContext(), ListActivity.class);
+                    launchWants.putExtra("list_view_type", WANTS_LIST_VIEW);
+                    startActivityForResult(launchWants, WANTS_RET_OK);
+                 }
+            }
+        );
+
+        // Stuff for "all"
+        final TextView all = findViewById(R.id.all);
+        all.setOnClickListener(
+                new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent launchAll = new Intent(v.getContext(), ListActivity.class);
+                        launchAll.putExtra("list_view_type", ALL_LIST_VIEW);
+                        startActivityForResult(launchAll, ALL_RET_OK);
+                    }
+                }
         );
     }
 
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == NEEDS_RET_OK) {
+        if (resultCode == NEEDS_RET_OK)
+        {
             double total = data.getExtras().getDouble("total");
             String text = String.format(Locale.US, "$%.2f", total);
             ((TextView) findViewById(R.id.main_needs_amount)).setText(text);
             update_textviews();
         }
-        else if (resultCode == WANTS_RET_OK) {
+        else if (resultCode == WANTS_RET_OK)
+        {
             double total = data.getExtras().getDouble("total");
             String text = String.format(Locale.US, "$%.2f", total);
             ((TextView) findViewById(R.id.main_wants_amount)).setText(text);
             update_textviews();
         }
-        else if (requestCode == EDIT_GOAL_RET_OK){
+        else if (requestCode == EDIT_GOAL_RET_OK)
+        {
             update_textviews();
         }
     }
 
-    public void update_textviews(){
 
+    public void update_textviews()
+    {
         TextView main_title = findViewById(R.id.main_title);
         main_title.setPaintFlags(main_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
@@ -131,12 +178,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView needs_total = findViewById(R.id.main_needs_amount);
-        needs_total.setText(get_list_total_string(get_total_spent(NEEDS_ONLY, PERIODS_THIS)));
+        needs_total.setText(get_list_total_string(get_total_spent(FILTER_NEEDS_ONLY, PERIODS_THIS)));
 
         TextView wants_total = findViewById(R.id.main_wants_amount);
-        wants_total.setText(get_list_total_string(get_total_spent(WANTS_ONLY, PERIODS_THIS)));
+        wants_total.setText(get_list_total_string(get_total_spent(FILTER_WANTS_ONLY, PERIODS_THIS)));
 
-        double spent = get_total_spent(ALL_PURCHASES, PERIODS_THIS);
+        double spent = get_total_spent(FILTER_ALL, PERIODS_THIS);
         set_main_remaining_amount(c.monthly_goal_amount - spent);
 
         int days_remaining = get_days_until_day_of_month(c.start_day);
@@ -144,17 +191,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void insert_config_into_db(goal_config c){
+
+    public void insert_config_into_db(goal_config c)
+    {
         // Always overwrite the previous table
         sql_db.execSQL("DROP TABLE IF EXISTS c0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
-        String insert_cmd = String.format(Locale.US, "INSERT INTO c0 VALUES(%.2f, %d);", c.monthly_goal_amount, c.start_day);
+        String insert_cmd = String.format(
+                Locale.US,
+                "INSERT INTO c0 VALUES(%.2f, %d);",
+                c.monthly_goal_amount,
+                c.start_day
+        );
         sql_db.execSQL(insert_cmd);
     }
 
-    public goal_config read_goal_config_from_db(){
+
+    public goal_config read_goal_config_from_db()
+    {
         Cursor resultSet = sql_db.rawQuery("Select * from c0", null);
-        if(!resultSet.moveToFirst()){
+        if(!resultSet.moveToFirst())
+        {
+            // Config not found, return default config
             goal_config c = new goal_config(800,25);
             return c;
         }
@@ -165,28 +223,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void insert_purchase(purchase_item p){
-        String insert_cmd = String.format(Locale.US, "INSERT INTO t0 VALUES(%f, '%s', %d, %d);", p.price, p.description, p.date, p.need);
+    public void insert_purchase(purchase_item p)
+    {
+        String insert_cmd = String.format(
+                Locale.US,
+                "INSERT INTO t0 VALUES(%f, '%s', %d, %d);",
+                p.price,
+                p.description,
+                p.date,
+                p.need
+        );
         sql_db.execSQL(insert_cmd);
     }
 
-    public Vector<purchase_item> get_all_purchases(int filter){
+
+    public Vector<purchase_item> get_all_purchases(int filter)
+    {
         Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
-        if(!resultSet.moveToFirst()){
+        if(!resultSet.moveToFirst())
+        {
             return null;
         }
         Vector<purchase_item> all_purchases = new Vector<>();
-        while(true){
-
+        while(true)
+        {
             double price = Double.parseDouble(resultSet.getString(0));
             String description = resultSet.getString(1);
             int date = Integer.parseInt(resultSet.getString(2));
             int need = Integer.parseInt(resultSet.getString(3));
             purchase_item p = new purchase_item(price, description, date, need);
-            if ((filter == NEEDS_ONLY && need == 1) || (filter == WANTS_ONLY && need == 0) || filter == ALL_PURCHASES){
+            if ((filter == FILTER_NEEDS_ONLY && need == IS_A_NEED) ||
+                (filter == FILTER_WANTS_ONLY && need == IS_NOT_A_NEED) ||
+                (filter == FILTER_ALL))
+            {
                 all_purchases.add(p);
             }
-            if (resultSet.isLast()){
+            if (resultSet.isLast())
+            {
                 break;
             }
             resultSet.moveToNext();
@@ -194,20 +267,26 @@ public class MainActivity extends AppCompatActivity {
         return all_purchases;
     }
 
-    public boolean remove_purchase_by_id(int id){
+
+    public boolean remove_purchase_by_id(int id)
+    {
         Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
-        if(!resultSet.moveToFirst()){
+        if(!resultSet.moveToFirst())
+        {
             return false;
         }
-        while(true){
+        while(true)
+        {
             String date_string = resultSet.getString(2);
             int date = Integer.parseInt(date_string);
-            if (date == id){
+            if (date == id)
+            {
                 String cmd = String.format(Locale.US, "DELETE FROM t0 WHERE date = %d", date);
                 sql_db.execSQL(cmd);
                 return true;
             }
-            if (resultSet.isLast()){
+            if (resultSet.isLast())
+            {
                 break;
             }
             resultSet.moveToNext();
@@ -215,44 +294,64 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    purchase_item get_purchase_item_from_view(TextView v){
+
+    purchase_item get_purchase_item_from_view(TextView v)
+    {
         String description = "";
         double price = 0;
-        try {
+        try
+        {
             description = ((String) v.getText()).split("\\r?\\n")[1];
             String first_line = ((String) v.getText()).split("\\r?\\n")[0];
             String without_dollar_sign = first_line.substring(1);
             price = Double.parseDouble(without_dollar_sign);
         }
-        catch (Exception e){
-            String msg = String.format(Locale.US, "Parse failed on string '%s'", v.getText());
+        catch (Exception e)
+        {
+            String msg = String.format(
+                Locale.US,
+                "Parse failed on string '%s'",
+                v.getText()
+            );
             Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        };
+        }
         int id = v.getId();
-        purchase_item p = new purchase_item(price, description, id, needs);
+        purchase_item p = new purchase_item(
+            price,
+            description,
+            id,
+            list_view_type
+        );
         return p;
     }
 
-    double get_total_spent(int filter, int period){
+
+    double get_total_spent(int filter, int period)
+    {
         Vector<purchase_item> purchases = get_all_purchases(filter);
-        if (period == PERIODS_THIS){
+        if (period == PERIODS_THIS)
+        {
             purchases = filter_purchases_this_period(purchases);
         }
         double total = 0;
-        while(purchases != null && !purchases.isEmpty()){
+        while(purchases != null && !purchases.isEmpty())
+        {
             total += purchases.get(0).price;
             purchases.remove(0);
         }
         return total;
     }
 
-    public class purchase_item{
+
+    public class purchase_item
+    {
         double price = 0.69;
         String description = "Not Set";
         int date = 0;
         int need = 1;
 
-        purchase_item(double price, String description, int date, int need){
+        purchase_item(double price, String description, int date, int need)
+        {
             this.price = price;
             this.description = description;
             this.date = date;
@@ -260,70 +359,97 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class goal_config{
+
+    public class goal_config
+    {
         double monthly_goal_amount = 0.0;
         int start_day = 25;
-        goal_config(double monthly_goal_amount, int start_day){
+        goal_config(double monthly_goal_amount, int start_day)
+        {
             this.monthly_goal_amount = monthly_goal_amount;
             this.start_day = start_day;
         }
     }
 
-    void set_main_monthly_goal_amount(double d){
+
+    void set_main_monthly_goal_amount(double d)
+    {
         TextView t = findViewById(R.id.main_monthly_budget_amount);
         t.setText(get_monthly_goal_amount_string(d));
     }
 
-    void set_main_monthly_start_day(int day){
+
+    void set_main_monthly_start_day(int day)
+    {
         TextView t = findViewById(R.id.main_monthly_budget_start_day);
         t.setText(get_monthly_start_day_string(day));
     }
 
-    void set_main_remaining_amount(double amount){
+
+    void set_main_remaining_amount(double amount)
+    {
         TextView t = findViewById(R.id.main_remaining_amount);
         String text = String.format(Locale.US, "Amount: $%.2f", amount);
         t.setText(text);
     }
 
-    void set_main_remaining_days(int days){
+
+    void set_main_remaining_days(int days)
+    {
         TextView t = findViewById(R.id.main_remaining_days);
         String text = String.format(Locale.US, "Days: %d", days);
         t.setText(text);
     }
 
-    int get_days_until_day_of_month(int day_of_month){
-        long new_date = (new Date()).getTime() + 60*60*24*1000; // Tomorrow
-        while ((new Date(new_date)).getDate() != day_of_month){
-            new_date += 60*60*24*1000;
-        };
+
+    int get_days_until_day_of_month(int day_of_month)
+    {
+        long new_date = (new Date()).getTime() + ms_in_a_day; // Tomorrow
+        while ((new Date(new_date)).getDate() != day_of_month)
+        {
+            new_date += ms_in_a_day;
+        }
         long ms_difference = new_date - (new Date()).getTime();
-        int day_difference = (int) (ms_difference / (60*60*24*1000));
+        int day_difference = (int) (ms_difference / (ms_in_a_day));
         return day_difference;
     }
 
-    int get_days_since_day_of_month(int day_of_month){
+
+    int get_days_since_day_of_month(int day_of_month)
+    {
         long old_date = (new Date()).getTime();
 
-        while ((new Date(old_date)).getDate() != day_of_month){
-            old_date -= 60*60*24*1000;
+        while ((new Date(old_date)).getDate() != day_of_month)
+        {
+            old_date -= ms_in_a_day;
         };
         long ms_difference = (new Date()).getTime() - old_date;
-        int day_difference = (int) (ms_difference / (60*60*24*1000));
+        int day_difference = (int) (ms_difference / (ms_in_a_day));
         return day_difference;
     }
 
-    int get_seconds_from_ms(long ms){
+
+    int get_seconds_from_ms(long ms)
+    {
         long seconds = (ms / (long) 1000.0);
         return (int) seconds;
     }
 
-    Vector<purchase_item> sort_purchases_newest_first(Vector<purchase_item> purchases){
-        if (purchases == null){return null;}
+
+    Vector<purchase_item> sort_purchases_newest_first(Vector<purchase_item> purchases)
+    {
+        if (purchases == null)
+        {
+            return null;
+        }
         boolean sorted = false;
-        while(!sorted) {
+        while(!sorted)
+        {
             sorted = true;
-            for (int i = 0; i < purchases.size() - 1; i++) {
-                if (purchases.elementAt(i).date < purchases.elementAt(i + 1).date) {
+            for (int i = 0; i < purchases.size() - 1; i++)
+            {
+                if (purchases.elementAt(i).date < purchases.elementAt(i + 1).date)
+                {
                     Collections.swap(purchases, i, i + 1);
                     sorted = false;
                 }
@@ -332,26 +458,56 @@ public class MainActivity extends AppCompatActivity {
         return purchases;
     }
 
-    Vector<purchase_item> filter_purchases_this_period(Vector<purchase_item> purchases){
-        if (purchases == null){return null;}
+
+    Vector<purchase_item> filter_purchases_this_period(Vector<purchase_item> purchases)
+    {
+        if (purchases == null)
+        {
+            return null;
+        }
         Vector<purchase_item> purchases_this_month = new Vector<>();
         goal_config c = read_goal_config_from_db();
         int seconds_today = ((new Date()).getHours()*3600) + ((new Date()).getMinutes()*60);
         Date d = new Date();
         int days_since_start = get_days_since_day_of_month(c.start_day);
-        int seconds_since_start = days_since_start*24*60*60 + seconds_today;
-        for (int i = 0; i < purchases.size(); i++) {
-            if((get_seconds_from_ms(d.getTime()) - purchases.elementAt(i).date) < seconds_since_start){
+        int seconds_since_start = days_since_start*seconds_in_a_day + seconds_today;
+        for (int i = 0; i < purchases.size(); i++)
+        {
+            if((get_seconds_from_ms(d.getTime()) - purchases.elementAt(i).date) < seconds_since_start)
+            {
                 purchases_this_month.add(purchases.elementAt(i));
             }
         }
         //String msg = String.format(Locale.US, "Seconds today %d", seconds_today);
         //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        if (purchases_this_month.size() == 0){return null;}
+        if (purchases_this_month.size() == 0)
+        {
+            return null;
+        }
         return purchases_this_month;
     }
 
-    String get_list_total_string(double d){return String.format(Locale.US,"$%.2f", d);}
-    String get_monthly_start_day_string(int day){return String.format(Locale.US,"Start Day: %dth", day);}
-    String get_monthly_goal_amount_string(double amount){return String.format(Locale.US,"Amount: $%.2f", amount);}
+
+    String get_list_total_string(double d)
+    {
+        return String.format(Locale.US,"$%.2f", d);
+    }
+
+
+    String get_monthly_start_day_string(int day)
+    {
+        String suffix = "th";
+        String[] suffix_exceptions = {"", "st", "nd", "rd"};
+        if(day >= 1 && day <= 3)
+        {
+            suffix = suffix_exceptions[day];
+        }
+        return String.format(Locale.US,"Start Day: %d%s", day, suffix);
+    }
+
+
+    String get_monthly_goal_amount_string(double amount)
+    {
+        return String.format(Locale.US,"Amount: $%.2f", amount);
+    }
 }
