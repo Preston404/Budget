@@ -63,8 +63,11 @@ public class MainActivity extends AppCompatActivity
 
 
     purchase_item last_purchase_clicked;
-    int IS_A_NEED = FILTER_NEEDS_ONLY;
-    int IS_NOT_A_NEED = FILTER_WANTS_ONLY;
+    // The needs field in the database should really be stored
+    // as a boolean, but these variables are used for now...
+    int IS_A_NEED = 1;
+    int IS_NOT_A_NEED = 0;
+
     int list_view_type = FILTER_NEEDS_ONLY;
 
 

@@ -106,11 +106,16 @@ public class ListActivity extends MainActivity
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
             int date = get_seconds_from_ms((new Date()).getTime());
+            int purchase_type = IS_A_NEED;
+            if(list_view_type != NEEDS_LIST_VIEW)
+            {
+                purchase_type = IS_NOT_A_NEED;
+            }
             purchase_item p = new purchase_item(
                 price,
                 description,
                 date,
-                list_view_type
+                purchase_type
             );
             insert_purchase(p);
             int top_purchase_index = 3;
