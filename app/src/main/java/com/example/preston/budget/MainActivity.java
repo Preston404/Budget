@@ -4,36 +4,17 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
 
-import com.example.preston.budget.ListActivity;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -228,15 +209,17 @@ public class MainActivity extends AppCompatActivity
 
     public void insert_purchase(purchase_item p)
     {
-        String insert_cmd = String.format(
-                Locale.US,
-                "INSERT INTO t0 VALUES(%f, '%s', %d, %d);",
+        sql_db.execSQL
+        (
+            "INSERT INTO t0 (price, description, date, needs) VALUES (?, ?, ?, ?); ",
+            new Object[]
+            {
                 p.price,
                 p.description,
                 p.date,
                 p.need
+            }
         );
-        sql_db.execSQL(insert_cmd);
     }
 
 
