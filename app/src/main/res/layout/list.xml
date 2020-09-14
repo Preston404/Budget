@@ -48,12 +48,16 @@
                 android:id="@+id/list_add_item"
                 />
 
-            <FrameLayout
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/fragment_layout"
-                >
-            </FrameLayout>
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:layout_margin="@dimen/button_margin"
+                android:text="Filter Purchases"
+                android:id="@+id/list_filter"
+                />
 
         </LinearLayout>
     </ScrollView>

@@ -39,6 +39,11 @@
             android:label="EditGoal"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".GetFilter"
+            android:label="GetFilter"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
     </application>
 

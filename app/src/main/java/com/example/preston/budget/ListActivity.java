@@ -11,9 +11,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.Calendar;
 
 
 /**
@@ -72,9 +74,28 @@ public class ListActivity extends MainActivity
             }
         );
 
+        Button filter_button = findViewById(R.id.list_filter);
+
+        filter_button.setOnClickListener(
+                new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        Intent launchGetFilter = new Intent(v.getContext(), GetFilter.class);
+                        int requested_code = GET_FILTER_RET_OK;
+                        startActivityForResult(launchGetFilter, requested_code);
+                    }
+                }
+        );
+
         if(list_view_type == ALL_LIST_VIEW)
         {
             main_layout.removeView(b);
+        }
+        else
+        {
+            main_layout.removeView(filter_button);
         }
     }
 
@@ -128,6 +149,34 @@ public class ListActivity extends MainActivity
             ((ViewGroup) t.getParent()).removeView(t);
             Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
         }
+        else if (resultCode == GET_FILTER_RET_OK)
+        {
+            Calendar calendar = Calendar.getInstance();
+            int seconds_today = calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.HOUR_OF_DAY) * 3600;
+            int filter_seconds_ago_max = (data.getExtras().getInt("days_max") * seconds_in_a_day);
+            if (filter_seconds_ago_max != 0)
+            {
+                filter_seconds_ago_max = filter_seconds_ago_max + seconds_today;
+            }
+            int filter_seconds_ago_min = (data.getExtras().getInt("days_min") * seconds_in_a_day);
+            if (filter_seconds_ago_min != 0)
+            {
+                filter_seconds_ago_min = filter_seconds_ago_min - (seconds_in_a_day - seconds_today);
+            }
+
+            String filter_string = data.getExtras().getString("string");
+            Integer needs_filter = data.getExtras().getInt("needs");
+            Double filter_price_max = data.getExtras().getDouble("price_max");
+            Double filter_price_min = data.getExtras().getDouble("price_min");
+            hide_purchase_views(
+                    filter_seconds_ago_max,
+                    filter_seconds_ago_min,
+                    needs_filter,
+                    filter_string,
+                    filter_price_max,
+                    filter_price_min
+            );
+        }
         update_background();
         update_total();
     }
@@ -154,6 +203,63 @@ public class ListActivity extends MainActivity
         setResult(result_code, intent);
         finish();
         super.onBackPressed();
+    }
+
+    void hide_purchase_views(
+            int filter_seconds_ago_max,
+            int filter_seconds_ago_min,
+            int needs_filter,
+            String filter_string,
+            double filter_price_max,
+            double filter_price_min
+    )
+    {
+        int seconds_now = get_seconds_from_ms((new Date()).getTime());
+        // Skip over Title and Total views
+        for (int i = main_layout.getChildCount(); i > 2; i--)
+        {
+            boolean remove_it = false;
+            purchase_item p = get_purchase_item_from_view((TextView) main_layout.getChildAt(i));
+            if (p == null)
+            {
+                continue;
+            }
+            int time_ago = seconds_now - p.date;
+
+            if (needs_filter == FILTER_NEEDS_ONLY && p.need != IS_A_NEED)
+            {
+                remove_it = true;
+            }
+            else if (needs_filter == FILTER_WANTS_ONLY && p.need != IS_NOT_A_NEED)
+            {
+                remove_it = true;
+            }
+            else if (!filter_string.equals("") && !p.description.toLowerCase().contains(filter_string.toLowerCase()))
+            {
+                remove_it = true;
+            }
+            else if (filter_seconds_ago_max != 0 && time_ago > filter_seconds_ago_max)
+            {
+                remove_it = true;
+            }
+            else if (filter_seconds_ago_min != 0 && time_ago < filter_seconds_ago_min)
+            {
+                remove_it = true;
+            }
+            else if (filter_price_min != 0 && p.price < filter_price_min)
+            {
+                remove_it = true;
+            }
+            else if (filter_price_max != 0 && p.price > filter_price_max)
+            {
+                remove_it = true;
+            }
+
+            if (remove_it)
+            {
+                main_layout.removeView(main_layout.getChildAt(i));
+            }
+        }
     }
 
     TextView create_purchase_view(purchase_item p)
@@ -217,11 +323,6 @@ public class ListActivity extends MainActivity
     {
         Vector<TextView> purchase_textviews = get_purchase_textviews();
         int view_num = 0;
-        if(list_view_type == ALL_LIST_VIEW)
-        {
-            // List view showing all doesn't have the "Add purchase button"
-            view_num++;
-        }
         while(!purchase_textviews.isEmpty())
         {
             int first_in_list = 0;
@@ -257,7 +358,7 @@ public class ListActivity extends MainActivity
         for (int i = 0; i < num_children; i++)
         {
             View v = main_layout.getChildAt(i);
-            if (!(v instanceof TextView)){continue;}
+            if (!(v instanceof TextView) || (v instanceof Button)){continue;}
             TextView tv = (TextView) v;
             if (!Arrays.asList(static_views).contains(tv.getId()))
             {

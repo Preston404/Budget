@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity
     final int WANTS_LIST_VIEW = FILTER_WANTS_ONLY;
     final int ALL_LIST_VIEW = FILTER_ALL;
 
+    final int GET_FILTER_RET_OK = 68;
     final int ADD_ITEM_RET_OK = 69;
     final int EDIT_ITEM_RET_OK = 70;
     final int EDIT_ITEM_RET_DELETE = 71;
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public Vector<purchase_item> get_all_purchases(int filter)
+    public Vector<purchase_item> get_all_purchases(int filter_need)
     {
         Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
         if(!resultSet.moveToFirst())
@@ -238,9 +239,9 @@ public class MainActivity extends AppCompatActivity
             int date = Integer.parseInt(resultSet.getString(2));
             int need = Integer.parseInt(resultSet.getString(3));
             purchase_item p = new purchase_item(price, description, date, need);
-            if ((filter == FILTER_NEEDS_ONLY && need == IS_A_NEED) ||
-                (filter == FILTER_WANTS_ONLY && need == IS_NOT_A_NEED) ||
-                (filter == FILTER_ALL))
+            if ((filter_need == FILTER_NEEDS_ONLY && need == IS_A_NEED) ||
+                (filter_need == FILTER_WANTS_ONLY && need == IS_NOT_A_NEED) ||
+                (filter_need == FILTER_ALL))
             {
                 all_purchases.add(p);
             }
@@ -294,12 +295,16 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            String msg = String.format(
-                Locale.US,
-                "Parse failed on string '%s'",
-                v.getText()
-            );
-            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            if (v != null)
+            {
+                String msg = String.format(
+                        Locale.US,
+                        "Parse failed on string '%s'",
+                        v.getText()
+                );
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+            }
+            return null;
         }
         int id = v.getId();
         purchase_item p = new purchase_item(

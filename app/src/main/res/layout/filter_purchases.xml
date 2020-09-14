@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorWhite"
+    android:id="@+id/filter_purchases">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/filter_purchases_title"
+                android:background="@color/colorPrimary"
+                android:textColor="@color/colorWhite"
+                android:text="Filter Purchases"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Max Days Ago"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/max_days_edit_text"
+                android:text="0"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Min Days Ago"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/min_days_edit_text"
+                android:text="0"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Contains Text"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/string_edit_text"
+                android:text=""
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Min Price"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/price_min_edit_text"
+                android:text="0"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Max Price"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/price_max_edit_text"
+                android:text="0"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Purchase Type"
+                />
+            <Spinner
+                android:id="@+id/needs_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt">
+            </Spinner>
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:layout_margin="@dimen/button_margin"
+                android:background="@color/colorLightGreen"
+                android:id="@+id/filter_purchases_button"
+                android:text="Submit"
+                />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

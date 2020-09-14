@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Budget</string>
     <string name="action_settings">Settings</string>
+
+    <string-array name="spinner_choices">
+        <item>All</item>
+        <item>Wants</item>
+        <item>Needs</item>
+    </string-array>
+
 </resources>
