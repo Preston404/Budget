@@ -131,11 +131,16 @@ public class ListActivity extends MainActivity
             remove_purchase_by_id(id);
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
+            int purchase_type = IS_A_NEED;
+            if(list_view_type != NEEDS_LIST_VIEW)
+            {
+                purchase_type = IS_NOT_A_NEED;
+            }
             purchase_item p = new purchase_item(
                 price,
                 description,
                 id,
-                list_view_type
+                purchase_type
             );
             insert_purchase(p);
             TextView t = findViewById(id);
