@@ -83,23 +83,6 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:background="@color/colorLightBlue"
-                android:text="Min Price"
-                />
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:id="@+id/price_min_edit_text"
-                android:text="0"
-                />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:background="@color/colorLightBlue"
                 android:text="Max Price"
                 />
             <EditText
@@ -108,6 +91,22 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:id="@+id/price_max_edit_text"
+                android:text="0"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Min Price"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:id="@+id/price_min_edit_text"
                 android:text="0"
                 />
 
