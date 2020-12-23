@@ -131,20 +131,31 @@ public class ListActivity extends MainActivity
             remove_purchase_by_id(id);
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
-            int purchase_type = IS_A_NEED;
-            if(list_view_type != NEEDS_LIST_VIEW)
+            // Convert the list view type returned to the need type... sigh
+            Integer view_type = data.getExtras().getInt("view_type");
+            Integer purchase_type = IS_A_NEED;
+            if(view_type != NEEDS_LIST_VIEW)
             {
                 purchase_type = IS_NOT_A_NEED;
             }
+            // Create the purchase
             purchase_item p = new purchase_item(
                 price,
                 description,
                 id,
                 purchase_type
             );
+            // Update the database
             insert_purchase(p);
             TextView t = findViewById(id);
-            t.setText(get_purchase_text(p));
+            if (view_type == list_view_type)
+            {
+                t.setText(get_purchase_text(p));
+            }
+            else
+            {
+                ((LinearLayout) findViewById(R.id.list_main)).removeView(t);
+            }
             Toast.makeText(this, "Purchase Edited", Toast.LENGTH_SHORT).show();
         }
         else if (resultCode == EDIT_ITEM_RET_DELETE)
@@ -395,6 +406,7 @@ public class ListActivity extends MainActivity
             Intent launchAddItem = new Intent(v.getContext(), EditItem.class);
             launchAddItem.putExtra("price", p.price);
             launchAddItem.putExtra("description", p.description);
+            launchAddItem.putExtra("need", p.need);
             int requested_code = EDIT_ITEM_RET_OK;
             startActivityForResult(launchAddItem, requested_code);
             last_purchase_clicked = p;

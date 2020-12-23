@@ -306,12 +306,17 @@ public class MainActivity extends AppCompatActivity
             }
             return null;
         }
+        int need = IS_A_NEED;
+        if (list_view_type == WANTS_LIST_VIEW)
+        {
+            need = IS_NOT_A_NEED;
+        }
         int id = v.getId();
         purchase_item p = new purchase_item(
             price,
             description,
             id,
-            list_view_type
+            need
         );
         return p;
     }

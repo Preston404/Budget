@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Budget</string>
     <string name="action_settings">Settings</string>
+    <string name="toggle_needs">Need</string>
+    <string name="toggle_wants">Want</string>
 
     <string-array name="spinner_choices">
         <item>All</item>
