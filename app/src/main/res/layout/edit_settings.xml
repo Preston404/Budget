@@ -4,17 +4,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorWhite"
-    android:id="@+id/edit_goal">
+    android:id="@+id/edit_settings">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20pt"
-        android:id="@+id/edit_goal_title"
+        android:id="@+id/edit_settings_title"
         android:background="@color/colorPrimary"
         android:textColor="@color/colorWhite"
-        android:text="Goal"
+        android:text="Settings"
         />
     <Button
         android:layout_width="match_parent"
@@ -55,9 +55,26 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20pt"
+        android:background="@color/colorLightBlue"
+        android:text="Text Size"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20pt"
+        android:id="@+id/text_size_edit_text"
+        android:text="25"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20pt"
         android:layout_margin="@dimen/button_margin"
         android:background="@color/colorLightGreen"
-        android:id="@+id/edit_goal_button"
+        android:id="@+id/edit_settings_button"
         android:text="Submit"
         />
 

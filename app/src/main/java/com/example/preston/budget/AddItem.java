@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class AddItem extends MainActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.add_item);
+        set_text_size_for_child_views((LinearLayout) findViewById(R.id.add_item));
 
         TextView item_title = findViewById(R.id.add_item_title);
         item_title.setPaintFlags(item_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);

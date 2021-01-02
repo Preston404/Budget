@@ -5,11 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +38,7 @@ public class GetFilter extends MainActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.filter_purchases);
         context = this;
+        set_text_size_for_child_views((LinearLayout) findViewById(R.id.filter_purchases_linear_layout));
 
         TextView goal_title = findViewById(R.id.filter_purchases_title);
         goal_title.setPaintFlags(goal_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -55,7 +59,6 @@ public class GetFilter extends MainActivity{
 
         SpinnerActivity spinnerActivity = new SpinnerActivity();
         spinner.setOnItemSelectedListener(spinnerActivity);
-
 
         get_filter_button.setOnClickListener(new View.OnClickListener(){
             @Override

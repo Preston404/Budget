@@ -7,8 +7,11 @@ import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.util.Collections;
 import java.util.Date;
@@ -40,7 +43,7 @@ public class MainActivity extends AppCompatActivity
     final int EDIT_ITEM_RET_DELETE = 71;
     final int NEEDS_RET_OK = 72;
     final int WANTS_RET_OK = 73;
-    final int EDIT_GOAL_RET_OK = 74;
+    final int EDIT_SETTINGS_RET_OK = 74;
     final int ALL_RET_OK = 75;
 
 
@@ -62,19 +65,20 @@ public class MainActivity extends AppCompatActivity
         sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE,null);
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
+        //sql_db.execSQL("DROP TABLE IF EXISTS c0;");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER);");
 
         update_textviews();
 
-        final TextView goals = findViewById(R.id.main_monthly_budget_title);
-        goals.setOnClickListener(
+        final TextView settings = findViewById(R.id.main_settings_title);
+        settings.setOnClickListener(
             new View.OnClickListener()
             {
                  @Override
                  public void onClick(View v)
                  {
-                     Intent launchWants = new Intent(v.getContext(), EditGoal.class);
-                     startActivityForResult(launchWants, EDIT_GOAL_RET_OK);
+                     Intent launchSettings = new Intent(v.getContext(), EditSettings.class);
+                     startActivityForResult(launchSettings, EDIT_SETTINGS_RET_OK);
                  }
             }
         );
@@ -123,6 +127,7 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
         );
+
     }
 
 
@@ -144,7 +149,7 @@ public class MainActivity extends AppCompatActivity
             ((TextView) findViewById(R.id.main_wants_amount)).setText(text);
             update_textviews();
         }
-        else if (requestCode == EDIT_GOAL_RET_OK)
+        else if (requestCode == EDIT_SETTINGS_RET_OK)
         {
             update_textviews();
         }
@@ -156,11 +161,11 @@ public class MainActivity extends AppCompatActivity
         TextView main_title = findViewById(R.id.main_title);
         main_title.setPaintFlags(main_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
-        goal_config c = read_goal_config_from_db();
+        set_text_size_for_child_views((LinearLayout) findViewById(R.id.main_linear_layout));
 
+        settings_config c = read_settings_config_from_db();
         set_main_monthly_goal_amount(c.monthly_goal_amount);
         set_main_monthly_start_day(c.start_day);
-
 
         TextView needs_total = findViewById(R.id.main_needs_amount);
         needs_total.setText(get_list_total_string(get_total_spent(FILTER_NEEDS_ONLY, PERIODS_THIS)));
@@ -177,33 +182,35 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void insert_config_into_db(goal_config c)
+    public void insert_config_into_db(settings_config c)
     {
         // Always overwrite the previous table
         sql_db.execSQL("DROP TABLE IF EXISTS c0;");
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER);");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER);");
         String insert_cmd = String.format(
                 Locale.US,
-                "INSERT INTO c0 VALUES(%.2f, %d);",
+                "INSERT INTO c0 VALUES(%.2f, %d, %d);",
                 c.monthly_goal_amount,
-                c.start_day
+                c.start_day,
+                c.text_size
         );
         sql_db.execSQL(insert_cmd);
     }
 
 
-    public goal_config read_goal_config_from_db()
+    public settings_config read_settings_config_from_db()
     {
         Cursor resultSet = sql_db.rawQuery("Select * from c0", null);
         if(!resultSet.moveToFirst())
         {
             // Config not found, return default config
-            goal_config c = new goal_config(800,25);
+            settings_config c = new settings_config(800,25, 25);
             return c;
         }
         double monthly_goal_amount  = Double.parseDouble(resultSet.getString(0));
         int start_day = Integer.parseInt(resultSet.getString(1));
-        goal_config c = new goal_config(monthly_goal_amount, start_day);
+        int text_size = Integer.parseInt(resultSet.getString(2));
+        settings_config c = new settings_config(monthly_goal_amount, start_day, text_size);
         return c;
     }
 
@@ -281,6 +288,27 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
+    int get_need_type_from_id(int id)
+    {
+        // The date field doubles as an ID
+        String cmd = String.format(Locale.US, "SELECT * FROM t0 WHERE date = %d", id);
+        Cursor resultSet = sql_db.rawQuery(cmd, null);
+        // Assume failure
+        int need = -1;
+        if(resultSet.moveToFirst())
+        {
+            if(resultSet.isLast())
+            {
+                need = Integer.parseInt(resultSet.getString(3));
+                if (need != IS_A_NEED && need != IS_NOT_A_NEED)
+                {
+                    Toast.makeText(this, "Invalid need type.", Toast.LENGTH_SHORT).show();
+                    need = -1;
+                }
+            }
+        }
+        return need;
+    }
 
     purchase_item get_purchase_item_from_view(TextView v)
     {
@@ -306,12 +334,13 @@ public class MainActivity extends AppCompatActivity
             }
             return null;
         }
-        int need = IS_A_NEED;
-        if (list_view_type == WANTS_LIST_VIEW)
-        {
-            need = IS_NOT_A_NEED;
-        }
+
         int id = v.getId();
+        int need = get_need_type_from_id(id);
+        if(need == -1)
+        {
+            return null;
+        }
         purchase_item p = new purchase_item(
             price,
             description,
@@ -356,14 +385,16 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public class goal_config
+    public class settings_config
     {
         double monthly_goal_amount = 0.0;
         int start_day = 25;
-        goal_config(double monthly_goal_amount, int start_day)
+        int text_size = 25;
+        settings_config(double monthly_goal_amount, int start_day, int text_size)
         {
             this.monthly_goal_amount = monthly_goal_amount;
             this.start_day = start_day;
+            this.text_size = text_size;
         }
     }
 
@@ -462,7 +493,7 @@ public class MainActivity extends AppCompatActivity
             return null;
         }
         Vector<purchase_item> purchases_this_month = new Vector<>();
-        goal_config c = read_goal_config_from_db();
+        settings_config c = read_settings_config_from_db();
         int seconds_today = ((new Date()).getHours()*3600) + ((new Date()).getMinutes()*60);
         Date d = new Date();
         int days_since_start = get_days_since_day_of_month(c.start_day);
@@ -505,5 +536,39 @@ public class MainActivity extends AppCompatActivity
     String get_monthly_goal_amount_string(double amount)
     {
         return String.format(Locale.US,"Amount: $%.2f", amount);
+    }
+
+    void set_text_size_for_child_views(LinearLayout parent_view)
+    {
+        int size = read_settings_config_from_db().text_size;
+        int num_children = parent_view.getChildCount();
+        for(int i = 0; i<num_children; i++)
+        {
+            View child = parent_view.getChildAt(i);
+            if (child instanceof TextView)
+            {
+                ((TextView) child).setTextSize(size);
+            }
+            else if(child instanceof Button)
+            {
+                ((Button) child).setTextSize(size);
+            }
+            else if(child instanceof ToggleButton)
+            {
+                ((ToggleButton) child).setTextSize(size);
+            }
+        }
+    }
+
+
+    int get_default_purchase_view_text_size()
+    {
+        int text_size = read_settings_config_from_db().text_size;
+        int purchase_text_size = text_size / 2;
+        if (purchase_text_size == 0)
+        {
+            purchase_text_size = text_size;
+        }
+        return purchase_text_size;
     }
 }

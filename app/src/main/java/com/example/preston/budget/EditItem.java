@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -28,6 +29,7 @@ public class EditItem extends MainActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_item);
         context = this;
+        set_text_size_for_child_views((LinearLayout) findViewById(R.id.edit_item));
 
         TextView item_title = findViewById(R.id.edit_item_title);
         item_title.setPaintFlags(item_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);

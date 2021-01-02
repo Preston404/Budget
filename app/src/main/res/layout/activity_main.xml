@@ -15,6 +15,7 @@
             android:orientation="vertical"
             android:textColor="@color/colorWhite"
             android:background="@color/colorWhite"
+            android:id="@+id/main_linear_layout"
             >
             <TextView
                 android:layout_width="match_parent"
@@ -62,8 +63,8 @@
                 android:background="@color/colorLightBlue"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_margin="@dimen/button_margin"
-                android:text="Monthly Goals"
-                android:id="@+id/main_monthly_budget_title"
+                android:text="Settings"
+                android:id="@+id/main_settings_title"
                 />
             <TextView
                 android:layout_width="match_parent"

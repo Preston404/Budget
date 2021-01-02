@@ -32,6 +32,7 @@ public class ListActivity extends MainActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
+
         main_layout = findViewById(R.id.list_main);
         list_view_type = getIntent().getExtras().getInt("list_view_type");
 
@@ -56,46 +57,41 @@ public class ListActivity extends MainActivity
 
         draw_list_screen();
 
-        Button b = findViewById(R.id.list_add_item);
-        b.setOnClickListener(
-            new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    if(list_view_type == ALL_LIST_VIEW)
+        if(list_view_type == ALL_LIST_VIEW)
+        {
+            Button filter_button = findViewById(R.id.list_filter);
+            filter_button.setOnClickListener(
+                    new View.OnClickListener()
                     {
-                        return;
+                        @Override
+                        public void onClick(View v)
+                        {
+                Intent launchGetFilter = new Intent(v.getContext(), GetFilter.class);
+                int requested_code = GET_FILTER_RET_OK;
+                startActivityForResult(launchGetFilter, requested_code);
+                        }
                     }
-                    Intent launchAddItem = new Intent(v.getContext(), AddItem.class);
-                    int requested_code = ADD_ITEM_RET_OK;
-                    startActivityForResult(launchAddItem, requested_code);
-                }
-            }
-        );
-
-        Button filter_button = findViewById(R.id.list_filter);
-
-        filter_button.setOnClickListener(
+            );
+            // Can't add purchases from ALL view
+            main_layout.removeView(findViewById(R.id.list_add_item));
+        }
+        else
+        {
+            Button add_button = findViewById(R.id.list_add_item);
+            add_button.setOnClickListener(
                 new View.OnClickListener()
                 {
                     @Override
                     public void onClick(View v)
                     {
-                        Intent launchGetFilter = new Intent(v.getContext(), GetFilter.class);
-                        int requested_code = GET_FILTER_RET_OK;
-                        startActivityForResult(launchGetFilter, requested_code);
+                        Intent launchAddItem = new Intent(v.getContext(), AddItem.class);
+                        int requested_code = ADD_ITEM_RET_OK;
+                        startActivityForResult(launchAddItem, requested_code);
                     }
                 }
-        );
-
-        if(list_view_type == ALL_LIST_VIEW)
-        {
-            main_layout.removeView(b);
-        }
-        else
-        {
-            main_layout.removeView(filter_button);
+            );
+            // Only allow filtering from ALL view
+            main_layout.removeView(findViewById(R.id.list_filter));
         }
     }
 
@@ -198,22 +194,18 @@ public class ListActivity extends MainActivity
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         Intent intent = new Intent();
         double total = Double.parseDouble(((TextView) findViewById(R.id.list_view_total)).getText().toString().substring(1));
         intent.putExtra("total", total);
         int result_code = -1;
-        if(list_view_type == NEEDS_LIST_VIEW)
-        {
+        if (list_view_type == NEEDS_LIST_VIEW) {
             result_code = NEEDS_RET_OK;
         }
-        if(list_view_type == WANTS_LIST_VIEW)
-        {
+        if (list_view_type == WANTS_LIST_VIEW) {
             result_code = WANTS_RET_OK;
         }
-        if(list_view_type == ALL_LIST_VIEW)
-        {
+        if (list_view_type == ALL_LIST_VIEW) {
             result_code = ALL_RET_OK;
         }
         setResult(result_code, intent);
@@ -284,7 +276,7 @@ public class ListActivity extends MainActivity
         String text = get_purchase_text(p);
         t.setText(text);
         t.setGravity(Gravity.CENTER);
-        t.setTextSize(20);
+        t.setTextSize(get_default_purchase_view_text_size());
         t.setOnClickListener(purchase_clicked);
         t.setId(p.date);
         t.setLayoutParams(
@@ -305,6 +297,9 @@ public class ListActivity extends MainActivity
             ((ViewGroup) textviews.get(0).getParent()).removeView(textviews.get(0));
             textviews.remove(0);
         }
+        // Set text size for titles and buttons
+        set_text_size_for_child_views((LinearLayout) findViewById(R.id.list_main));
+        int purchase_view_text_size = get_default_purchase_view_text_size();
 
         double total = 0;
 
@@ -327,6 +322,7 @@ public class ListActivity extends MainActivity
         {
             int first_in_list = 0;
             TextView t = create_purchase_view(purchase_items.get(first_in_list));
+            t.setTextSize(purchase_view_text_size);
             main_layout.addView(t);
             total += purchase_items.get(first_in_list).price;
             purchase_items.removeElementAt(first_in_list);
@@ -412,4 +408,5 @@ public class ListActivity extends MainActivity
             last_purchase_clicked = p;
         }
     };
+
 }

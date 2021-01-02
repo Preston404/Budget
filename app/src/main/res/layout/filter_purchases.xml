@@ -13,6 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:id="@+id/filter_purchases_linear_layout"
             android:orientation="vertical">
 
             <TextView
