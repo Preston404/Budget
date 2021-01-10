@@ -205,7 +205,7 @@ public class ListActivity extends MainActivity
             double filter_price_min
     )
     {
-        // Skip over "Title" and "Total" views
+        // Skip over "Title", "Total", and "Button" views
         for (int i = main_layout.getChildCount(); i > 2; i--)
         {
             boolean remove_it = false;

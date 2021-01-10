@@ -6,12 +6,24 @@
     android:id="@+id/get_date_layout"
     >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20pt"
+        android:id="@+id/get_date_title"
+        android:background="@color/colorPrimary"
+        android:textColor="@color/colorWhite"
+        android:text="Select Date"
+        />
     <DatePicker
         android:id="@+id/date_picker"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/fab_margin"
+        android:theme="@style/AppTheme"
+        />
     <Button
         android:id="@+id/get_date_button"
         android:layout_width="match_parent"

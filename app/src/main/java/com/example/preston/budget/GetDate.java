@@ -1,12 +1,14 @@
 package com.example.preston.budget;
 
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import java.util.Date;
 import java.util.List;
@@ -21,6 +23,8 @@ public class GetDate extends MainActivity {
         setContentView(R.layout.get_date);
 
         set_text_size_for_child_views((LinearLayout) findViewById(R.id.get_date_layout));
+        TextView date_title = findViewById(R.id.get_date_title);
+        date_title.setPaintFlags(date_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 
         get_date_button = findViewById(R.id.get_date_button);
         date_picker = findViewById(R.id.date_picker);
