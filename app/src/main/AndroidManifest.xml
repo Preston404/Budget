@@ -44,6 +44,11 @@
             android:label="GetFilter"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".GetDate"
+            android:label="GetDate"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
     </application>
 

@@ -163,30 +163,13 @@ public class ListActivity extends MainActivity
         }
         else if (resultCode == GET_FILTER_RET_OK)
         {
-            Calendar calendar = Calendar.getInstance();
-            int seconds_today = calendar.get(Calendar.MINUTE) * 60 + calendar.get(Calendar.HOUR_OF_DAY) * 3600;
-            int filter_seconds_ago_max = (data.getExtras().getInt("days_max") * seconds_in_a_day);
-            if (filter_seconds_ago_max != 0)
-            {
-                filter_seconds_ago_max = filter_seconds_ago_max + seconds_today;
-            }
-            int filter_seconds_ago_min = (data.getExtras().getInt("days_min") * seconds_in_a_day);
-            if (filter_seconds_ago_min != 0)
-            {
-                filter_seconds_ago_min = filter_seconds_ago_min - (seconds_in_a_day - seconds_today);
-            }
-
-            String filter_string = data.getExtras().getString("string");
-            Integer needs_filter = data.getExtras().getInt("needs");
-            Double filter_price_max = data.getExtras().getDouble("price_max");
-            Double filter_price_min = data.getExtras().getDouble("price_min");
             hide_purchase_views(
-                    filter_seconds_ago_max,
-                    filter_seconds_ago_min,
-                    needs_filter,
-                    filter_string,
-                    filter_price_max,
-                    filter_price_min
+                    data.getExtras().getLong("day_start"),
+                    data.getExtras().getLong("day_end"),
+                    data.getExtras().getInt("needs"),
+                    data.getExtras().getString("string"),
+                    data.getExtras().getDouble("price_max"),
+                    data.getExtras().getDouble("price_min")
             );
         }
         update_background();
@@ -214,26 +197,24 @@ public class ListActivity extends MainActivity
     }
 
     void hide_purchase_views(
-            int filter_seconds_ago_max,
-            int filter_seconds_ago_min,
+            long day_start,
+            long day_end,
             int needs_filter,
             String filter_string,
             double filter_price_max,
             double filter_price_min
     )
     {
-        int seconds_now = get_seconds_from_ms((new Date()).getTime());
-        // Skip over Title and Total views
+        // Skip over "Title" and "Total" views
         for (int i = main_layout.getChildCount(); i > 2; i--)
         {
             boolean remove_it = false;
             purchase_item p = get_purchase_item_from_view((TextView) main_layout.getChildAt(i));
-            if (p == null)
-            {
+
+            if (p == null) {
                 continue;
             }
-            int time_ago = seconds_now - p.date;
-
+            long purchase_time =  get_ms_from_seconds(p.date);
             if (needs_filter == FILTER_NEEDS_ONLY && p.need != IS_A_NEED)
             {
                 remove_it = true;
@@ -246,11 +227,11 @@ public class ListActivity extends MainActivity
             {
                 remove_it = true;
             }
-            else if (filter_seconds_ago_max != 0 && time_ago > filter_seconds_ago_max)
+            else if (day_start != 0 && purchase_time < day_start)
             {
                 remove_it = true;
             }
-            else if (filter_seconds_ago_min != 0 && time_ago < filter_seconds_ago_min)
+            else if (day_end != 0 && purchase_time > day_end)
             {
                 remove_it = true;
             }

@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity
     final int WANTS_LIST_VIEW = FILTER_WANTS_ONLY;
     final int ALL_LIST_VIEW = FILTER_ALL;
 
+    final int GET_DATE_RET_OK = 67;
     final int GET_FILTER_RET_OK = 68;
     final int ADD_ITEM_RET_OK = 69;
     final int EDIT_ITEM_RET_OK = 70;
@@ -458,8 +459,15 @@ public class MainActivity extends AppCompatActivity
 
     int get_seconds_from_ms(long ms)
     {
-        long seconds = (ms / (long) 1000.0);
+        long seconds = (ms / (long) 1000);
         return (int) seconds;
+    }
+
+
+    long get_ms_from_seconds(int seconds)
+    {
+        long ms = ((long) seconds * 1000);
+        return ms;
     }
 
 

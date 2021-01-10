@@ -33,15 +33,16 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:background="@color/colorLightBlue"
-                android:text="Max Days Ago"
+                android:id="@+id/start_day_button"
+                android:text="Start Day"
                 />
-            <EditText
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="20pt"
-                android:id="@+id/max_days_edit_text"
-                android:text="0"
+                android:id="@+id/start_day_text_view"
+                android:text="None"
                 />
 
             <Button
@@ -50,15 +51,16 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:background="@color/colorLightBlue"
-                android:text="Min Days Ago"
+                android:id="@+id/end_day_button"
+                android:text="End Day"
                 />
-            <EditText
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textSize="20pt"
-                android:id="@+id/min_days_edit_text"
-                android:text="0"
+                android:id="@+id/end_day_text_view"
+                android:text="None"
                 />
 
             <Button
