@@ -62,6 +62,8 @@
         android:id="@+id/toggle_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin"
+        android:layout_marginBottom="@dimen/button_margin"
         android:textAllCaps="false"
         android:fontFamily="sans-serif"
         android:background="@color/colorWhite"
@@ -70,6 +72,28 @@
         android:checked="true"
         android:textOff="@string/toggle_wants"
         android:textOn="@string/toggle_needs"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/colorLightBlue"
+        android:text="Date"
+        android:textSize="20pt"
+        android:id="@+id/edit_item_date_button"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/button_margin"
+        android:layout_marginBottom="@dimen/button_margin"
+        android:gravity="center"
+        android:textSize="20pt"
+        android:textColor="@color/colorPrimaryDark"
+        android:background="@color/colorWhite"
+        android:text="None"
+        android:id="@+id/edit_item_date_text"
         />
 
     <Button

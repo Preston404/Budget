@@ -57,9 +57,8 @@ public class AddItem extends MainActivity
                     return;
                 }
                 Intent intent = new Intent();
-                String[] d_array = (new Date()).toString().split("\\s+");
-                String d =  d_array[1] + " " + d_array[2];
-                description = String.format(Locale.US, "%s: %s", d, description);
+                String month_day = get_month_day_string(new Date());
+                description = String.format(Locale.US, "%s: %s", month_day, description);
                 intent.putExtra("price",price);
                 intent.putExtra("description",description);
                 setResult(ADD_ITEM_RET_OK, intent);

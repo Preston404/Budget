@@ -124,7 +124,6 @@ public class ListActivity extends MainActivity
         else if (resultCode == EDIT_ITEM_RET_OK)
         {
             int id = last_purchase_clicked.date;
-            remove_purchase_by_id(id);
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
             // Convert the list view type returned to the need type... sigh
@@ -134,25 +133,35 @@ public class ListActivity extends MainActivity
             {
                 purchase_type = IS_NOT_A_NEED;
             }
-            // Create the purchase
+            Integer date = data.getExtras().getInt("date");
+
             purchase_item p = new purchase_item(
                 price,
                 description,
-                id,
+                date,
                 purchase_type
             );
+
             // Update the database
-            insert_purchase(p);
-            TextView t = findViewById(id);
-            if (view_type == list_view_type)
+            if(remove_purchase_by_id(id))
             {
-                t.setText(get_purchase_text(p));
+                insert_purchase(p);
+                TextView t = findViewById(id);
+                if (view_type == list_view_type)
+                {
+                    t.setText(get_purchase_text(p));
+                }
+                else
+                {
+                    // Needs/Wants changed, don't show this purchase here anymore
+                    ((LinearLayout) findViewById(R.id.list_main)).removeView(t);
+                }
+                Toast.makeText(this, "Purchase Edited", Toast.LENGTH_SHORT).show();
             }
             else
             {
-                ((LinearLayout) findViewById(R.id.list_main)).removeView(t);
+                Toast.makeText(this, "Failed to Edit Purchase", Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(this, "Purchase Edited", Toast.LENGTH_SHORT).show();
         }
         else if (resultCode == EDIT_ITEM_RET_DELETE)
         {
@@ -246,6 +255,8 @@ public class ListActivity extends MainActivity
 
             if (remove_it)
             {
+                //
+                // main_layout.getChildAt(i).setVisibility(View.GONE);
                 main_layout.removeView(main_layout.getChildAt(i));
             }
         }
@@ -338,7 +349,11 @@ public class ListActivity extends MainActivity
         while(!purchase_textviews.isEmpty())
         {
             int first_in_list = 0;
-            total += get_purchase_item_from_view(purchase_textviews.get(first_in_list)).price;
+            purchase_item p = get_purchase_item_from_view(purchase_textviews.get(first_in_list));
+            if(p != null)
+            {
+                total += p.price;
+            }
             purchase_textviews.remove(first_in_list);
         }
         ((TextView) findViewById(R.id.list_view_total)).setText(get_list_total_string(total));
@@ -384,6 +399,7 @@ public class ListActivity extends MainActivity
             launchAddItem.putExtra("price", p.price);
             launchAddItem.putExtra("description", p.description);
             launchAddItem.putExtra("need", p.need);
+            launchAddItem.putExtra("date", p.date);
             int requested_code = EDIT_ITEM_RET_OK;
             startActivityForResult(launchAddItem, requested_code);
             last_purchase_clicked = p;

@@ -35,7 +35,6 @@ public class GetFilter extends MainActivity{
     EditText price_max_edit_text;
     EditText price_min_edit_text;
     Button get_filter_button;
-    Spinner spinner;
     String filter_needs_string = "All";
     Context context;
     View last_view_clicked;
@@ -137,6 +136,12 @@ public class GetFilter extends MainActivity{
         @Override
         public void onClick(View v) {
             Intent launchGetDate = new Intent(v.getContext(), GetDate.class);
+            String date_title = "Start Date";
+            if (v == findViewById(R.id.end_day_button) || v == findViewById(R.id.end_day_text_view))
+            {
+                date_title = "End Date";
+            }
+            launchGetDate.putExtra("title", date_title);
             int requested_code = GET_DATE_RET_OK;
             last_view_clicked = v;
             startActivityForResult(launchGetDate, requested_code);

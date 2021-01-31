@@ -16,6 +16,7 @@ import java.util.List;
 public class GetDate extends MainActivity {
     Button get_date_button;
     DatePicker date_picker;
+    TextView date_title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,8 @@ public class GetDate extends MainActivity {
 
         get_date_button = findViewById(R.id.get_date_button);
         date_picker = findViewById(R.id.date_picker);
+        date_title = findViewById(R.id.get_date_title);
+        date_title.setText(getIntent().getExtras().getString("title"));
 
         get_date_button.setOnClickListener(new View.OnClickListener() {
             @Override

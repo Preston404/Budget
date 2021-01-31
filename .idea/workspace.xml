@@ -22,12 +22,14 @@
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/AddItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/AddItem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/EditItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/EditItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetDate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetDate.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/ListActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/ListActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/edit_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/edit_item.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/filter_purchases.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/filter_purchases.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/get_date.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/get_date.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/spinner_view.xml" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -338,22 +340,22 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="496" y="106" key="AndroidProcessChooserDialog/0.0.1280.680@0.0.1280.680" timestamp="1610258788042" />
-    <state width="1236" height="194" key="GridCell.Tab.0.bottom" timestamp="1610261867482">
+    <state width="1236" height="116" key="GridCell.Tab.0.bottom" timestamp="1612053567202">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="194" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1610261867482" />
-    <state width="1236" height="194" key="GridCell.Tab.0.center" timestamp="1610261867482">
+    <state width="1236" height="116" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1612053567202" />
+    <state width="1236" height="116" key="GridCell.Tab.0.center" timestamp="1612053567201">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="194" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1610261867482" />
-    <state width="1236" height="194" key="GridCell.Tab.0.left" timestamp="1610261867482">
+    <state width="1236" height="116" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1612053567201" />
+    <state width="1236" height="116" key="GridCell.Tab.0.left" timestamp="1612053567200">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="194" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1610261867482" />
-    <state width="1236" height="194" key="GridCell.Tab.0.right" timestamp="1610261867482">
+    <state width="1236" height="116" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1612053567200" />
+    <state width="1236" height="116" key="GridCell.Tab.0.right" timestamp="1612053567201">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="194" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1610261867482" />
+    <state width="1236" height="116" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1612053567201" />
     <state width="1236" height="194" key="GridCell.Tab.1.bottom" timestamp="1610261867483">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
@@ -370,11 +372,10 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state width="1236" height="194" key="GridCell.Tab.1.right/0.0.1280.680@0.0.1280.680" timestamp="1610261867483" />
-    <state x="336" y="164" key="com.intellij.ide.util.TipDialog" timestamp="1610302435682">
+    <state x="336" y="164" key="com.intellij.ide.util.TipDialog" timestamp="1612041722590">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state x="336" y="164" key="com.intellij.ide.util.TipDialog/0.0.1280.680/-1920.0.1920.1040@0.0.1280.680" timestamp="1602817301500" />
-    <state x="336" y="164" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1610302435682" />
+    <state x="336" y="164" key="com.intellij.ide.util.TipDialog/0.0.1280.680@0.0.1280.680" timestamp="1612041722590" />
     <state x="403" y="185" key="edit.logcat.filter.dialog.dimensions" timestamp="1610258881100">
       <screen x="0" y="0" width="1280" height="680" />
     </state>

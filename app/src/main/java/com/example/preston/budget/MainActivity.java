@@ -579,4 +579,12 @@ public class MainActivity extends AppCompatActivity
         }
         return purchase_text_size;
     }
+
+    // e.g. "Jan 10"
+    String get_month_day_string(Date date)
+    {
+        String[] d_array = date.toString().split("\\s+");
+        String month_day =  d_array[1] + " " + d_array[2];
+        return month_day;
+    }
 }
