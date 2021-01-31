@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MainActivity extends AppCompatActivity
@@ -215,9 +217,21 @@ public class MainActivity extends AppCompatActivity
         return c;
     }
 
-
-    public void insert_purchase(purchase_item p)
+    // The date doubles as the purchase ID, so we'll push the
+    // date forward a second if it is not unique. Returns the date
+    // used as the ID
+    public int insert_purchase(purchase_item p)
     {
+        boolean adjusted_date = false;
+        while (db_contains_purhcase_with_id(p.date))
+        {
+            adjusted_date = true;
+            p.date = p.date + 1;
+        }
+        if(adjusted_date)
+        {
+            Toast.makeText(this, "Purchase ID Adjusted", Toast.LENGTH_SHORT).show();
+        }
         sql_db.execSQL
         (
             "INSERT INTO t0 (price, description, date, needs) VALUES (?, ?, ?, ?); ",
@@ -229,8 +243,21 @@ public class MainActivity extends AppCompatActivity
                 p.need
             }
         );
+        return p.date;
     }
 
+    boolean db_contains_purhcase_with_id(int id)
+    {
+        boolean contains_id = false;
+        // The date field doubles as an ID
+        String cmd = String.format(Locale.US, "SELECT * FROM t0 WHERE date = %d", id);
+        Cursor resultSet = sql_db.rawQuery(cmd, null);
+        if(resultSet.moveToFirst())
+        {
+            contains_id = true;
+        }
+        return contains_id;
+    }
 
     public Vector<purchase_item> get_all_purchases(int filter_need)
     {
@@ -301,12 +328,22 @@ public class MainActivity extends AppCompatActivity
             if(resultSet.isLast())
             {
                 need = Integer.parseInt(resultSet.getString(3));
-                if (need != IS_A_NEED && need != IS_NOT_A_NEED)
-                {
-                    Toast.makeText(this, "Invalid need type.", Toast.LENGTH_SHORT).show();
-                    need = -1;
-                }
             }
+            else
+            {
+                Toast.makeText(this, "Could not find unique db entry for id:", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
+            }
+        }
+        else
+        {
+            Toast.makeText(this, "Could not find db entry for id:", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
+        }
+        if (need != IS_A_NEED && need != IS_NOT_A_NEED && need != -1)
+        {
+            need = -1;
+            Toast.makeText(this, "Invalid need type.", Toast.LENGTH_SHORT).show();
         }
         return need;
     }
@@ -315,12 +352,14 @@ public class MainActivity extends AppCompatActivity
     {
         String description = "";
         double price = 0;
+        // First char should be '$' so skip it
+        String all_text = ((String) v.getText()).substring(1);
         try
         {
-            description = ((String) v.getText()).split("\\r?\\n")[1];
-            String first_line = ((String) v.getText()).split("\\r?\\n")[0];
-            String without_dollar_sign = first_line.substring(1);
-            price = Double.parseDouble(without_dollar_sign);
+            String lines[] = all_text.split("\\r?\\n");
+            price = Double.parseDouble(lines[0]);
+            description = lines[1];
+            //description = matcher.group(1);
         }
         catch (Exception e)
         {
@@ -329,16 +368,21 @@ public class MainActivity extends AppCompatActivity
                 String msg = String.format(
                         Locale.US,
                         "Parse failed on string '%s'",
-                        v.getText()
+                        all_text
                 );
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, e.toString(), Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Error, Cannot convert null view", Toast.LENGTH_SHORT).show();
             }
             return null;
         }
 
-        int id = v.getId();
+        int id = ((TextView) v).getId();
         int need = get_need_type_from_id(id);
-        if(need == -1)
+        if(need != IS_A_NEED && need != IS_NOT_A_NEED)
         {
             return null;
         }
@@ -513,8 +557,6 @@ public class MainActivity extends AppCompatActivity
                 purchases_this_month.add(purchases.elementAt(i));
             }
         }
-        //String msg = String.format(Locale.US, "Seconds today %d", seconds_today);
-        //Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         if (purchases_this_month.size() == 0)
         {
             return null;

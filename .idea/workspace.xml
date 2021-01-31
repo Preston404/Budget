@@ -16,20 +16,12 @@
       <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/classAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/classAnalysis.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/jarAnalysis.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/jarAnalysis.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/javaCompile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/javaCompile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/taskHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/6.1.1/javaCompile/taskHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/app/app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/AddItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/AddItem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/EditItem.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/EditItem.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetDate.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetDate.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/GetFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/ListActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/ListActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/preston/budget/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/edit_item.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/edit_item.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/filter_purchases.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/filter_purchases.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -340,22 +332,22 @@
       <screen x="0" y="0" width="1280" height="680" />
     </state>
     <state x="496" y="106" key="AndroidProcessChooserDialog/0.0.1280.680@0.0.1280.680" timestamp="1610258788042" />
-    <state width="1236" height="116" key="GridCell.Tab.0.bottom" timestamp="1612053567202">
+    <state width="1236" height="256" key="GridCell.Tab.0.bottom" timestamp="1612055831335">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="116" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1612053567202" />
-    <state width="1236" height="116" key="GridCell.Tab.0.center" timestamp="1612053567201">
+    <state width="1236" height="256" key="GridCell.Tab.0.bottom/0.0.1280.680@0.0.1280.680" timestamp="1612055831335" />
+    <state width="1236" height="256" key="GridCell.Tab.0.center" timestamp="1612055831334">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="116" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1612053567201" />
-    <state width="1236" height="116" key="GridCell.Tab.0.left" timestamp="1612053567200">
+    <state width="1236" height="256" key="GridCell.Tab.0.center/0.0.1280.680@0.0.1280.680" timestamp="1612055831334" />
+    <state width="1236" height="256" key="GridCell.Tab.0.left" timestamp="1612055831334">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="116" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1612053567200" />
-    <state width="1236" height="116" key="GridCell.Tab.0.right" timestamp="1612053567201">
+    <state width="1236" height="256" key="GridCell.Tab.0.left/0.0.1280.680@0.0.1280.680" timestamp="1612055831334" />
+    <state width="1236" height="256" key="GridCell.Tab.0.right" timestamp="1612055831335">
       <screen x="0" y="0" width="1280" height="680" />
     </state>
-    <state width="1236" height="116" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1612053567201" />
+    <state width="1236" height="256" key="GridCell.Tab.0.right/0.0.1280.680@0.0.1280.680" timestamp="1612055831335" />
     <state width="1236" height="194" key="GridCell.Tab.1.bottom" timestamp="1610261867483">
       <screen x="0" y="0" width="1280" height="680" />
     </state>

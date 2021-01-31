@@ -116,7 +116,9 @@ public class ListActivity extends MainActivity
                 date,
                 purchase_type
             );
-            insert_purchase(p);
+            int new_date = insert_purchase(p);
+            // insert_purchase may adjust the date to make it unique
+            p.date = new_date;
             int top_purchase_index = 3;
             main_layout.addView(create_purchase_view(p), top_purchase_index);
             Toast.makeText(this, "Purchase Saved", Toast.LENGTH_SHORT).show();
@@ -145,8 +147,13 @@ public class ListActivity extends MainActivity
             // Update the database
             if(remove_purchase_by_id(id))
             {
-                insert_purchase(p);
+                // insert_purchase may adjust the date to make it unique
+                int new_date = insert_purchase(p);
                 TextView t = findViewById(id);
+                if(new_date != p.date)
+                {
+                    t.setId(new_date);
+                }
                 if (view_type == list_view_type)
                 {
                     t.setText(get_purchase_text(p));
@@ -395,6 +402,10 @@ public class ListActivity extends MainActivity
                 return;
             }
             purchase_item p = get_purchase_item_from_view((TextView) v);
+            if(p == null)
+            {
+                return;
+            }
             Intent launchAddItem = new Intent(v.getContext(), EditItem.class);
             launchAddItem.putExtra("price", p.price);
             launchAddItem.putExtra("description", p.description);

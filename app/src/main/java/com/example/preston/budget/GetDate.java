@@ -45,7 +45,7 @@ public class GetDate extends MainActivity {
                 old_day.setDate(date_picker.getDayOfMonth());
                 old_day.setHours(0);
                 old_day.setMinutes(0);
-                old_day.setSeconds(0);
+                old_day.setSeconds(1);
 
                 Intent intent = new Intent();
                 intent.putExtra("date",old_day.getTime());
