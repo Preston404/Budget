@@ -119,16 +119,16 @@ public class MainActivity extends AppCompatActivity
         // Stuff for "all"
         final TextView all = findViewById(R.id.all);
         all.setOnClickListener(
-                new View.OnClickListener()
+            new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
                 {
-                    @Override
-                    public void onClick(View v)
-                    {
-                        Intent launchAll = new Intent(v.getContext(), ListActivity.class);
-                        launchAll.putExtra("list_view_type", ALL_LIST_VIEW);
-                        startActivityForResult(launchAll, ALL_RET_OK);
-                    }
+                    Intent launchAll = new Intent(v.getContext(), ListActivity.class);
+                    launchAll.putExtra("list_view_type", ALL_LIST_VIEW);
+                    startActivityForResult(launchAll, ALL_RET_OK);
                 }
+            }
         );
 
     }
@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity
             ((TextView) findViewById(R.id.main_wants_amount)).setText(text);
             update_textviews();
         }
-        else if (requestCode == EDIT_SETTINGS_RET_OK)
+        else if (requestCode == EDIT_SETTINGS_RET_OK || requestCode == ALL_RET_OK)
         {
             update_textviews();
         }
@@ -573,13 +573,20 @@ public class MainActivity extends AppCompatActivity
 
     String get_monthly_start_day_string(int day)
     {
+        String suffix = get_suffix_for_day(day);
+        return String.format(Locale.US,"Start Day: %d%s", day, suffix);
+    }
+
+    String get_suffix_for_day(int day)
+    {
         String suffix = "th";
         String[] suffix_exceptions = {"", "st", "nd", "rd"};
-        if(day >= 1 && day <= 3)
+        int day_mod = day % 10;
+        if(day_mod >= 1 && day_mod <= 3 && (day < 11 || day > 13))
         {
-            suffix = suffix_exceptions[day];
+            suffix = suffix_exceptions[day_mod];
         }
-        return String.format(Locale.US,"Start Day: %d%s", day, suffix);
+        return suffix;
     }
 
 
@@ -628,5 +635,23 @@ public class MainActivity extends AppCompatActivity
         String[] d_array = date.toString().split("\\s+");
         String month_day =  d_array[1] + " " + d_array[2];
         return month_day;
+    }
+
+    String get_string_from_date(Date date)
+    {
+        // input = Sun Jan 31 13:17:48 PST 2021
+        // output = Sun Jan 31st, 2021
+        String[] s = date.toString().split(" ");
+        int day_of_month = Integer.parseInt(s[2]);
+        String suffix = get_suffix_for_day(day_of_month);
+        String new_str = String.format(
+                "%s %s %s%s, %s",
+                s[0],
+                s[1],
+                s[2],
+                suffix,
+                s[5]
+        );
+        return new_str;
     }
 }

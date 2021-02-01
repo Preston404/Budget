@@ -56,7 +56,7 @@ public class EditItem extends MainActivity {
         }
         old_date = extra_data.getInt("date");
         new_date = old_date;
-        item_date_text.setText((new Date(get_ms_from_seconds(old_date))).toString());
+        item_date_text.setText(get_string_from_date(new Date(get_ms_from_seconds(old_date))));
 
         Button submit = findViewById(R.id.edit_submit_item);
         Button delete = findViewById(R.id.edit_delete_item);
@@ -112,6 +112,7 @@ public class EditItem extends MainActivity {
         public void onClick(View v) {
             Intent launchGetDate = new Intent(v.getContext(), GetDate.class);
             launchGetDate.putExtra("title", "Edit Item Date");
+            launchGetDate.putExtra("date", old_date);
             int requested_code = GET_DATE_RET_OK;
             startActivityForResult(launchGetDate, requested_code);
         }
@@ -124,7 +125,7 @@ public class EditItem extends MainActivity {
         {
             long date = data.getExtras().getLong("date");
             new_date = get_seconds_from_ms(date);
-            item_date_text.setText((new Date(date)).toString());
+            item_date_text.setText(get_string_from_date(new Date(date)));
 
             if (new_date != old_date)
             {

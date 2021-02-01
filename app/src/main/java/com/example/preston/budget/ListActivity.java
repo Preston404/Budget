@@ -148,14 +148,16 @@ public class ListActivity extends MainActivity
             if(remove_purchase_by_id(id))
             {
                 // insert_purchase may adjust the date to make it unique
-                int new_date = insert_purchase(p);
+                p.date = insert_purchase(p);
                 TextView t = findViewById(id);
-                if(new_date != p.date)
+                if (view_type == list_view_type || ALL_LIST_VIEW == list_view_type)
                 {
-                    t.setId(new_date);
-                }
-                if (view_type == list_view_type)
-                {
+                    if(p.date != t.getId())
+                    {
+                        int old_id = t.getId();
+                        t = create_purchase_view(p);
+                        replace_child_with_id(old_id, t);
+                    }
                     t.setText(get_purchase_text(p));
                 }
                 else
@@ -225,9 +227,14 @@ public class ListActivity extends MainActivity
         for (int i = main_layout.getChildCount(); i > 2; i--)
         {
             boolean remove_it = false;
-            purchase_item p = get_purchase_item_from_view((TextView) main_layout.getChildAt(i));
-
-            if (p == null) {
+            View child = main_layout.getChildAt(i);
+            if(child == null)
+            {
+                continue;
+            }
+            purchase_item p = get_purchase_item_from_view((TextView) child);
+            if (p == null)
+            {
                 continue;
             }
             long purchase_time =  get_ms_from_seconds(p.date);
@@ -383,6 +390,19 @@ public class ListActivity extends MainActivity
         return purchase_textviews;
     }
 
+    void replace_child_with_id(int id, TextView new_text_view)
+    {
+        for (int i = 0; i < main_layout.getChildCount(); i++)
+        {
+            if (main_layout.getChildAt(i).getId() == id)
+            {
+                main_layout.addView(new_text_view, i);
+                main_layout.removeViewAt(i+1);
+                break;
+            }
+        }
+    }
+
     String get_purchase_text(purchase_item p)
     {
         return String.format(
@@ -397,7 +417,7 @@ public class ListActivity extends MainActivity
     {
         public void onClick(View v)
         {
-            if (!(v instanceof TextView) || list_view_type == ALL_LIST_VIEW)
+            if (!(v instanceof TextView))
             {
                 return;
             }
@@ -416,5 +436,4 @@ public class ListActivity extends MainActivity
             last_purchase_clicked = p;
         }
     };
-
 }

@@ -142,6 +142,8 @@ public class GetFilter extends MainActivity{
                 date_title = "End Date";
             }
             launchGetDate.putExtra("title", date_title);
+            launchGetDate.putExtra("date", get_seconds_from_ms((new Date()).getTime()));
+
             int requested_code = GET_DATE_RET_OK;
             last_view_clicked = v;
             startActivityForResult(launchGetDate, requested_code);
@@ -161,15 +163,13 @@ public class GetFilter extends MainActivity{
                last_view_clicked == findViewById(R.id.start_day_button))
             {
                 filter_start_day = date;
-                start_day_text_view.setText((new Date(date)).toString());
+                start_day_text_view.setText(get_string_from_date(new Date(date)));
             }
             else if(last_view_clicked == findViewById(R.id.end_day_text_view) ||
                     last_view_clicked == findViewById(R.id.end_day_button))
             {
-                // Add 24 hours so that the filter will include purchases
-                // on the final day.
-                filter_end_day = date + get_ms_from_seconds(seconds_in_a_day-1);
-                end_day_text_view.setText((new Date(filter_end_day)).toString());
+                filter_end_day = date;
+                end_day_text_view.setText(get_string_from_date(new Date(date)));
             }
         }
     }

@@ -9,6 +9,8 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Date;
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public class GetDate extends MainActivity {
     Button get_date_button;
     DatePicker date_picker;
-    TextView date_title;
+    TimePicker time_picker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +31,18 @@ public class GetDate extends MainActivity {
 
         get_date_button = findViewById(R.id.get_date_button);
         date_picker = findViewById(R.id.date_picker);
+        time_picker = findViewById(R.id.time_picker);
+        time_picker.setIs24HourView(false);
         date_title = findViewById(R.id.get_date_title);
         date_title.setText(getIntent().getExtras().getString("title"));
+        int date;
+        try
+        {
+            date = getIntent().getExtras().getInt("date");
+            set_times(date);
+        }
+        catch (Exception e) {};
+
 
         get_date_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -43,8 +55,8 @@ public class GetDate extends MainActivity {
                 old_day.setYear(date_picker.getYear() - year_offset);
                 old_day.setMonth(date_picker.getMonth());
                 old_day.setDate(date_picker.getDayOfMonth());
-                old_day.setHours(0);
-                old_day.setMinutes(0);
+                old_day.setHours(time_picker.getCurrentHour());
+                old_day.setMinutes(time_picker.getCurrentMinute());
                 old_day.setSeconds(1);
 
                 Intent intent = new Intent();
@@ -53,5 +65,19 @@ public class GetDate extends MainActivity {
                 finish();
             }
         });
+    }
+
+    void set_times(int date)
+    {
+        Date this_date = new Date(get_ms_from_seconds(date));
+        date_picker.init(
+                this_date.getYear() + 1900,
+                this_date.getMonth(),
+                this_date.getDate(),
+                null
+        );
+
+        time_picker.setCurrentHour(this_date.getHours());
+        time_picker.setCurrentMinute(this_date.getMinutes());
     }
 }
