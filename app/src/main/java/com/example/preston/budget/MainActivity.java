@@ -1,11 +1,11 @@
 package com.example.preston.budget;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -13,12 +13,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 
 public class MainActivity extends AppCompatActivity
@@ -58,6 +71,8 @@ public class MainActivity extends AppCompatActivity
 
     int list_view_type = FILTER_NEEDS_ONLY;
 
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    Vector<purchase_item> purchases_from_firebase = new Vector<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -131,6 +146,7 @@ public class MainActivity extends AppCompatActivity
             }
         );
 
+        //test_firebase();
     }
 
 
@@ -653,5 +669,77 @@ public class MainActivity extends AppCompatActivity
                 s[5]
         );
         return new_str;
+    }
+
+    void write_firebase(purchase_item p, final Context the_context)
+    {
+        // Create a new purchase
+        Map<String, Object> purchase = new HashMap<>();
+        purchase.put("description", p.description);
+        purchase.put("price", p.price);
+        purchase.put("date", p.date);
+        purchase.put("need", p.need);
+
+        // Add a new document with a generated ID
+        db.collection("purchases")
+                .add(purchase)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference)
+                    {
+                        Toast.makeText(the_context, "write Success", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e)
+                    {
+                        Toast.makeText(the_context, "write Failure", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    void read_firebase(final purchase_item p, final Context the_context)
+    {
+        db.collection("purchases")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful())
+                        {
+                            Toast.makeText(the_context, "read Success", Toast.LENGTH_SHORT).show();
+                            purchases_from_firebase = new Vector<>();
+                            for (QueryDocumentSnapshot document : task.getResult())
+                            {
+                                if(document.getData().containsKey("date"))
+                                {
+                                    if(Integer.parseInt(document.get("date").toString()) == p.date)
+                                    {
+                                        purchase_item ret = new purchase_item(
+                                                Double.parseDouble(document.get("price").toString()),
+                                                document.get("description").toString(),
+                                                Integer.parseInt(document.get("date").toString()),
+                                                Integer.parseInt(document.get("need").toString())
+                                        );
+                                        Toast.makeText(the_context, "read Success", Toast.LENGTH_SHORT).show();
+                                        // Need to find a way to return this data
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Toast.makeText(the_context, "read Failure", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    void test_firebase()
+    {
+        purchase_item p = new purchase_item(0, "TEst", 123456, 1);
+        write_firebase(p, this);
+        read_firebase(p, this);
     }
 }

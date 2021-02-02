@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.constraint.ConstraintSet;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;

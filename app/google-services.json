@@ -8,20 +8,12 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1034384440655:android:97e840287ebeab2b6f993a",
+        "mobilesdk_app_id": "1:1034384440655:android:d1896c26e034a6fe6f993a",
         "android_client_info": {
           "package_name": "com.example.preston.budget"
         }
       },
       "oauth_client": [
-        {
-          "client_id": "1034384440655-ql0b8aau5md3lqd9qqgooirun1aacoot.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.preston.budget",
-            "certificate_hash": "0d205adb649854776faa9b6906dc5c2f754eecbb"
-          }
-        },
         {
           "client_id": "1034384440655-tlep1562epsir4gdkp9635ikuck66f94.apps.googleusercontent.com",
           "client_type": 3
