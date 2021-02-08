@@ -13,7 +13,9 @@ import android.widget.Toast;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
 import java.util.Calendar;
 
@@ -175,9 +177,15 @@ public class ListActivity extends MainActivity
         else if (resultCode == EDIT_ITEM_RET_DELETE)
         {
             TextView t = findViewById(last_purchase_clicked.date);
-            remove_purchase_by_id(t.getId());
-            ((ViewGroup) t.getParent()).removeView(t);
-            Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
+            if(remove_purchase_by_id(t.getId()))
+            {
+                ((ViewGroup) t.getParent()).removeView(t);
+                Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
+            }
+            else
+            {
+                Toast.makeText(this, "Failed to Remove Purchase", Toast.LENGTH_SHORT).show();
+            }
         }
         else if (resultCode == GET_FILTER_RET_OK)
         {
@@ -223,6 +231,7 @@ public class ListActivity extends MainActivity
             double filter_price_min
     )
     {
+        Map<Integer, Integer> id_to_needs_map = get_id_to_needs_map();
         // Skip over "Title", "Total", and "Button" views
         for (int i = main_layout.getChildCount(); i > 2; i--)
         {
@@ -232,7 +241,7 @@ public class ListActivity extends MainActivity
             {
                 continue;
             }
-            purchase_item p = get_purchase_item_from_view((TextView) child);
+            purchase_item p = get_purchase_item_from_view((TextView) child, id_to_needs_map);
             if (p == null)
             {
                 continue;
@@ -359,11 +368,12 @@ public class ListActivity extends MainActivity
     void update_total()
     {
         Vector<TextView> purchase_textviews = get_purchase_textviews();
+        Map<Integer, Integer> id_to_needs_map = get_id_to_needs_map();
         double total = 0;
         while(!purchase_textviews.isEmpty())
         {
             int first_in_list = 0;
-            purchase_item p = get_purchase_item_from_view(purchase_textviews.get(first_in_list));
+            purchase_item p = get_purchase_item_from_view(purchase_textviews.get(first_in_list), id_to_needs_map);
             if(p != null)
             {
                 total += p.price;
@@ -421,7 +431,7 @@ public class ListActivity extends MainActivity
             {
                 return;
             }
-            purchase_item p = get_purchase_item_from_view((TextView) v);
+            purchase_item p = get_purchase_item_from_view((TextView) v, null);
             if(p == null)
             {
                 return;
@@ -436,4 +446,15 @@ public class ListActivity extends MainActivity
             last_purchase_clicked = p;
         }
     };
+
+    Map<Integer, Integer> get_id_to_needs_map()
+    {
+        Map<Integer, Integer> id_to_needs_map = new HashMap<Integer,Integer>();
+        Vector<purchase_item> purchases = read_firebase(this,null,FILTER_ALL);
+        for(purchase_item item : purchases)
+        {
+            id_to_needs_map.put(item.date, item.need);
+        }
+        return id_to_needs_map;
+    }
 }

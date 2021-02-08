@@ -18,6 +18,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -25,6 +26,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
@@ -32,6 +34,8 @@ import java.util.Vector;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import static java.lang.Thread.sleep;
 
 
 public class MainActivity extends AppCompatActivity
@@ -72,7 +76,6 @@ public class MainActivity extends AppCompatActivity
     int list_view_type = FILTER_NEEDS_ONLY;
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    Vector<purchase_item> purchases_from_firebase = new Vector<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -145,8 +148,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         );
-
-        //test_firebase();
     }
 
 
@@ -239,7 +240,7 @@ public class MainActivity extends AppCompatActivity
     public int insert_purchase(purchase_item p)
     {
         boolean adjusted_date = false;
-        while (db_contains_purhcase_with_id(p.date))
+        while (db_contains_purchase_with_id(p.date))
         {
             adjusted_date = true;
             p.date = p.date + 1;
@@ -248,59 +249,38 @@ public class MainActivity extends AppCompatActivity
         {
             Toast.makeText(this, "Purchase ID Adjusted", Toast.LENGTH_SHORT).show();
         }
-        sql_db.execSQL
-        (
-            "INSERT INTO t0 (price, description, date, needs) VALUES (?, ?, ?, ?); ",
-            new Object[]
-            {
-                p.price,
-                p.description,
-                p.date,
-                p.need
-            }
-        );
+        write_firebase(p, this, true);
         return p.date;
     }
 
-    boolean db_contains_purhcase_with_id(int id)
+    boolean db_contains_purchase_with_id(int id)
     {
         boolean contains_id = false;
-        // The date field doubles as an ID
-        String cmd = String.format(Locale.US, "SELECT * FROM t0 WHERE date = %d", id);
-        Cursor resultSet = sql_db.rawQuery(cmd, null);
-        if(resultSet.moveToFirst())
+        Vector<purchase_item> purchases = read_firebase(this, null, FILTER_ALL);
+        if(purchases.isEmpty())
         {
-            contains_id = true;
+            return false;
         }
-        return contains_id;
+        else
+        {
+            for(purchase_item p : purchases)
+            {
+                // The date field doubles as an ID
+                if(p.date == id)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public Vector<purchase_item> get_all_purchases(int filter_need)
     {
-        Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
-        if(!resultSet.moveToFirst())
+        Vector<purchase_item> all_purchases = read_firebase(this, null, filter_need);
+        if (all_purchases.isEmpty())
         {
-            return null;
-        }
-        Vector<purchase_item> all_purchases = new Vector<>();
-        while(true)
-        {
-            double price = Double.parseDouble(resultSet.getString(0));
-            String description = resultSet.getString(1);
-            int date = Integer.parseInt(resultSet.getString(2));
-            int need = Integer.parseInt(resultSet.getString(3));
-            purchase_item p = new purchase_item(price, description, date, need);
-            if ((filter_need == FILTER_NEEDS_ONLY && need == IS_A_NEED) ||
-                (filter_need == FILTER_WANTS_ONLY && need == IS_NOT_A_NEED) ||
-                (filter_need == FILTER_ALL))
-            {
-                all_purchases.add(p);
-            }
-            if (resultSet.isLast())
-            {
-                break;
-            }
-            resultSet.moveToNext();
+            all_purchases = null;
         }
         return all_purchases;
     }
@@ -308,63 +288,55 @@ public class MainActivity extends AppCompatActivity
 
     public boolean remove_purchase_by_id(int id)
     {
-        Cursor resultSet = sql_db.rawQuery("Select * from t0", null);
-        if(!resultSet.moveToFirst())
+        Task task = db.collection("purchases").document(Integer.toString(id)).delete();
+        while(!task.isComplete());
+        if(!task.isSuccessful())
         {
+            Toast.makeText(this, "Failed to Delete from DB.", Toast.LENGTH_SHORT).show();
             return false;
         }
-        while(true)
-        {
-            String date_string = resultSet.getString(2);
-            int date = Integer.parseInt(date_string);
-            if (date == id)
-            {
-                String cmd = String.format(Locale.US, "DELETE FROM t0 WHERE date = %d", date);
-                sql_db.execSQL(cmd);
-                return true;
-            }
-            if (resultSet.isLast())
-            {
-                break;
-            }
-            resultSet.moveToNext();
-        }
-        return false;
+        return true;
     }
 
-    int get_need_type_from_id(int id)
+    int get_need_type_from_id(int id, Map<Integer, Integer> id_to_need_map)
     {
-        // The date field doubles as an ID
-        String cmd = String.format(Locale.US, "SELECT * FROM t0 WHERE date = %d", id);
-        Cursor resultSet = sql_db.rawQuery(cmd, null);
-        // Assume failure
         int need = -1;
-        if(resultSet.moveToFirst())
+        if(id_to_need_map != null)
         {
-            if(resultSet.isLast())
+            if (id_to_need_map.containsKey(id))
             {
-                need = Integer.parseInt(resultSet.getString(3));
+                need = id_to_need_map.get(id);
             }
             else
             {
-                Toast.makeText(this, "Could not find unique db entry for id:", Toast.LENGTH_SHORT).show();
-                Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Map Does not contain ID", Toast.LENGTH_SHORT).show();
             }
         }
         else
         {
-            Toast.makeText(this, "Could not find db entry for id:", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
+            // The date field doubles as an ID
+            Task task = db.collection("purchases").document(Integer.toString(id)).get();
+            while (!task.isComplete()){}
+            if (task.isSuccessful())
+            {
+                DocumentSnapshot doc = (DocumentSnapshot) task.getResult();
+                if (doc != null)
+                {
+                    need = Integer.parseInt(doc.get("need").toString());
+                }
+            }
         }
-        if (need != IS_A_NEED && need != IS_NOT_A_NEED && need != -1)
+        if(need == -1 || (need != IS_A_NEED && need != IS_NOT_A_NEED))
         {
+            Toast.makeText(this, "Could not find need tyep for id:", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, String.format("%d", need), Toast.LENGTH_SHORT).show();
             need = -1;
-            Toast.makeText(this, "Invalid need type.", Toast.LENGTH_SHORT).show();
         }
         return need;
     }
 
-    purchase_item get_purchase_item_from_view(TextView v)
+    purchase_item get_purchase_item_from_view(TextView v, Map<Integer,Integer> id_to_need_map)
     {
         String description = "";
         double price = 0;
@@ -375,7 +347,6 @@ public class MainActivity extends AppCompatActivity
             String lines[] = all_text.split("\\r?\\n");
             price = Double.parseDouble(lines[0]);
             description = lines[1];
-            //description = matcher.group(1);
         }
         catch (Exception e)
         {
@@ -397,7 +368,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         int id = ((TextView) v).getId();
-        int need = get_need_type_from_id(id);
+        int need = get_need_type_from_id(id, id_to_need_map);
         if(need != IS_A_NEED && need != IS_NOT_A_NEED)
         {
             return null;
@@ -671,7 +642,7 @@ public class MainActivity extends AppCompatActivity
         return new_str;
     }
 
-    void write_firebase(purchase_item p, final Context the_context)
+    void write_firebase(purchase_item p, final Context the_context, boolean wait)
     {
         // Create a new purchase
         Map<String, Object> purchase = new HashMap<>();
@@ -680,66 +651,90 @@ public class MainActivity extends AppCompatActivity
         purchase.put("date", p.date);
         purchase.put("need", p.need);
 
-        // Add a new document with a generated ID
-        db.collection("purchases")
-                .add(purchase)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+        // Write/Overwrite a new document
+        db.collection("purchases").document(Integer.toString(p.date))
+                .set(purchase)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference)
+                    public void onSuccess(Void nothing)
                     {
-                        Toast.makeText(the_context, "write Success", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(the_context, "write Success", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e)
                     {
-                        Toast.makeText(the_context, "write Failure", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(the_context, "Firestore Write Failure", Toast.LENGTH_SHORT).show();
                     }
                 });
+        if (wait)
+        {
+            db.waitForPendingWrites();
+        }
     }
 
-    void read_firebase(final purchase_item p, final Context the_context)
+    Vector<purchase_item> read_firebase(Context the_context, purchase_item item_to_find, int filter)
     {
-        db.collection("purchases")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful())
+        Vector<purchase_item> purchases_from_firebase = new Vector<>();
+        Task task = db.collection("purchases").get();
+        while(!task.isComplete());
+        if (task.isSuccessful())
+        {
+            //Toast.makeText(the_context, "read Success", Toast.LENGTH_SHORT).show();
+            QuerySnapshot snapshot = (QuerySnapshot) task.getResult();
+            if(snapshot != null)
+            {
+                for (QueryDocumentSnapshot document : snapshot)
+                {
+                    if (document.getData().containsKey("date"))
+                    {
+                        purchase_item this_purchase = get_purchase_item_from_doc(document);
+                        if (item_to_find != null)
                         {
-                            Toast.makeText(the_context, "read Success", Toast.LENGTH_SHORT).show();
-                            purchases_from_firebase = new Vector<>();
-                            for (QueryDocumentSnapshot document : task.getResult())
+                            if (item_to_find.date == this_purchase.date)
                             {
-                                if(document.getData().containsKey("date"))
-                                {
-                                    if(Integer.parseInt(document.get("date").toString()) == p.date)
-                                    {
-                                        purchase_item ret = new purchase_item(
-                                                Double.parseDouble(document.get("price").toString()),
-                                                document.get("description").toString(),
-                                                Integer.parseInt(document.get("date").toString()),
-                                                Integer.parseInt(document.get("need").toString())
-                                        );
-                                        Toast.makeText(the_context, "read Success", Toast.LENGTH_SHORT).show();
-                                        // Need to find a way to return this data
-                                    }
-                                }
+                                purchases_from_firebase.addElement(this_purchase);
+                                break;
                             }
                         }
-                        else
+                        else if(filter == FILTER_NEEDS_ONLY && this_purchase.need == IS_A_NEED)
                         {
-                            Toast.makeText(the_context, "read Failure", Toast.LENGTH_SHORT).show();
+                            purchases_from_firebase.addElement(get_purchase_item_from_doc(document));
+                        }
+                        else if(filter == FILTER_WANTS_ONLY && this_purchase.need == IS_NOT_A_NEED)
+                        {
+                            purchases_from_firebase.addElement(get_purchase_item_from_doc(document));
+                        }
+                        else if(filter == FILTER_ALL)
+                        {
+                            purchases_from_firebase.addElement(get_purchase_item_from_doc(document));
                         }
                     }
-                });
+                }
+            }
+            else
+            {
+                Toast.makeText(the_context, "Null Returned From DB", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else
+        {
+            Toast.makeText(the_context, "Firestore Read Failure", Toast.LENGTH_SHORT).show();
+        }
+        //Toast.makeText(the_context, "Read Complete", Toast.LENGTH_SHORT).show();
+        return purchases_from_firebase;
     }
 
-    void test_firebase()
+
+    purchase_item get_purchase_item_from_doc(QueryDocumentSnapshot document)
     {
-        purchase_item p = new purchase_item(0, "TEst", 123456, 1);
-        write_firebase(p, this);
-        read_firebase(p, this);
+        purchase_item ret = new purchase_item(
+                Double.parseDouble(document.get("price").toString()),
+                document.get("description").toString(),
+                Integer.parseInt(document.get("date").toString()),
+                Integer.parseInt(document.get("need").toString())
+        );
+        return ret;
     }
 }
