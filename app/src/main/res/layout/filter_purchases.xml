@@ -150,7 +150,7 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:background="@color/colorLightBlue"
-                android:text="Purchase Type"
+                android:text="Price Sort"
                 />
             <TextView
                 android:id="@+id/sort_price_textview"
