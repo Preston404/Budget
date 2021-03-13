@@ -195,7 +195,8 @@ public class ListActivity extends MainActivity
                     data.getExtras().getInt("needs"),
                     data.getExtras().getString("string"),
                     data.getExtras().getDouble("price_max"),
-                    data.getExtras().getDouble("price_min")
+                    data.getExtras().getDouble("price_min"),
+                    data.getExtras().getInt("sort_price")
             );
         }
         update_background();
@@ -228,7 +229,8 @@ public class ListActivity extends MainActivity
             int needs_filter,
             String filter_string,
             double filter_price_max,
-            double filter_price_min
+            double filter_price_min,
+            int sort_price
     )
     {
         Map<Integer, Integer> id_to_needs_map = get_id_to_needs_map();
@@ -236,16 +238,11 @@ public class ListActivity extends MainActivity
         for (int i = main_layout.getChildCount(); i > 2; i--)
         {
             boolean remove_it = false;
+
             View child = main_layout.getChildAt(i);
-            if(child == null)
-            {
-                continue;
-            }
             purchase_item p = get_purchase_item_from_view((TextView) child, id_to_needs_map);
-            if (p == null)
-            {
-                continue;
-            }
+            if(p == null){continue;}
+
             long purchase_time =  get_ms_from_seconds(p.date);
             if (needs_filter == FILTER_NEEDS_ONLY && p.need != IS_A_NEED)
             {
@@ -283,6 +280,45 @@ public class ListActivity extends MainActivity
                 main_layout.removeView(main_layout.getChildAt(i));
             }
         }
+        if(!SORT_OPTIONS[sort_price].contains("None"))
+        {
+            // First three views are not purchase views
+            for (int i = main_layout.getChildCount(); i > 2; i--)
+            {
+                // We look one ahead, so we don't need to iterate over the
+                // final purchase view.
+                for (int j = main_layout.getChildCount(); j > 3; j--)
+                {
+                    purchase_item lower_view = get_purchase_item_from_view(
+                            (TextView) main_layout.getChildAt(j), id_to_needs_map
+                    );
+                    purchase_item upper_view = get_purchase_item_from_view(
+                            (TextView) main_layout.getChildAt(j-1), id_to_needs_map
+                    );
+                    if(lower_view == null || upper_view == null)
+                    {
+                        continue;
+                    }
+                    if(SORT_OPTIONS[sort_price].contains("Max to Min") && upper_view.price < lower_view.price)
+                    {
+                        // Save the view and remove it from the layout
+                        TextView temp = (TextView) main_layout.getChildAt(j);
+                        main_layout.removeViewAt(j);
+                        // Put the view back into the layout at a different position
+                        main_layout.addView(temp,j-1);
+                    }
+                    else if(SORT_OPTIONS[sort_price].contains("Min to Max") && upper_view.price > lower_view.price)
+                    {
+                        // Save the view and remove it from the layout
+                        TextView temp = (TextView) main_layout.getChildAt(j);
+                        main_layout.removeViewAt(j);
+                        // Put the view back into the layout at a different position
+                        main_layout.addView(temp,j-1);
+                    }
+                }
+            }
+        }
+
     }
 
     TextView create_purchase_view(purchase_item p)

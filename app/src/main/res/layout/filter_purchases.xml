@@ -144,6 +144,27 @@
             </TextView>
 
             <Button
+                android:id="@+id/sort_price_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:text="Purchase Type"
+                />
+            <TextView
+                android:id="@+id/sort_price_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/button_margin"
+                android:layout_marginBottom="@dimen/button_margin"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:textColor="@color/colorPrimaryDark"
+                android:text="None">
+            </TextView>
+
+            <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"

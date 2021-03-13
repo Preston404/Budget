@@ -21,6 +21,10 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -35,8 +39,10 @@ public class GetFilter extends MainActivity{
     EditText price_min_edit_text;
     Button get_filter_button;
     String filter_needs_string = "All";
+    int sort_price_index = 0;
     Context context;
     View last_view_clicked;
+    int needs_filter = FILTER_ALL;
 
     long filter_start_day = 0;
     long filter_end_day = 0;
@@ -90,21 +96,12 @@ public class GetFilter extends MainActivity{
                     return;
                 }
 
-                int needs_filter = FILTER_ALL;
-                if(filter_needs_string.equals("Wants"))
-                {
-                    needs_filter = FILTER_WANTS_ONLY;
-                }
-                else if(filter_needs_string.equals("Needs"))
-                {
-                    needs_filter = FILTER_NEEDS_ONLY;
-                }
-
                 Intent intent = new Intent();
                 intent.putExtra("string",filter_string);
                 intent.putExtra("day_start",filter_start_day);
                 intent.putExtra("day_end",filter_end_day);
                 intent.putExtra("needs", needs_filter);
+                intent.putExtra("sort_price", sort_price_index);
                 intent.putExtra("price_max", filter_price_max);
                 intent.putExtra("price_min", filter_price_min);
                 setResult(GET_FILTER_RET_OK, intent);
@@ -128,6 +125,9 @@ public class GetFilter extends MainActivity{
 
         findViewById(R.id.purchase_type_textview).setOnClickListener(toggle_purchase_type);
         findViewById(R.id.purchase_type_button).setOnClickListener(toggle_purchase_type);
+
+        findViewById(R.id.sort_price_textview).setOnClickListener(toggle_sort_price);
+        findViewById(R.id.sort_price_button).setOnClickListener(toggle_sort_price);
     }
 
     public View.OnClickListener date_field_click_listener = new View.OnClickListener() {
@@ -197,16 +197,28 @@ public class GetFilter extends MainActivity{
             if(filter_needs_string.equals("All"))
             {
                 filter_needs_string = "Needs";
+                needs_filter = FILTER_NEEDS_ONLY;
             }
             else if(filter_needs_string.equals("Needs"))
             {
                 filter_needs_string = "Wants";
+                needs_filter = FILTER_WANTS_ONLY;
             }
             else if(filter_needs_string.equals("Wants"))
             {
                 filter_needs_string = "All";
+                needs_filter = FILTER_ALL;
             }
             ((TextView) findViewById(R.id.purchase_type_textview)).setText(filter_needs_string);
+        }
+    };
+
+    public View.OnClickListener toggle_sort_price = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            sort_price_index += 1;
+            sort_price_index %= SORT_OPTIONS.length;
+            ((TextView) findViewById(R.id.sort_price_textview)).setText(SORT_OPTIONS[sort_price_index]);
         }
     };
 }

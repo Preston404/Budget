@@ -56,6 +56,9 @@ public class MainActivity extends AppCompatActivity
     final int WANTS_LIST_VIEW = FILTER_WANTS_ONLY;
     final int ALL_LIST_VIEW = FILTER_ALL;
 
+    final String[] SORT_OPTIONS = {"None", "Min to Max", "Max to Min"};
+
+
     final int GET_DATE_RET_OK = 67;
     final int GET_FILTER_RET_OK = 68;
     final int ADD_ITEM_RET_OK = 69;
@@ -340,10 +343,13 @@ public class MainActivity extends AppCompatActivity
     {
         String description = "";
         double price = 0;
-        // First char should be '$' so skip it
-        String all_text = ((String) v.getText()).substring(1);
+        String all_text = "N/A";
         try
         {
+            // First char should be '$' so skip it
+            all_text = (String) v.getText();
+            all_text = all_text.substring(1);
+
             String lines[] = all_text.split("\\r?\\n");
             price = Double.parseDouble(lines[0]);
             description = lines[1];
@@ -362,15 +368,16 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                Toast.makeText(this, "Error, Cannot convert null view", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Error, Cannot convert null view", Toast.LENGTH_SHORT).show();
             }
             return null;
         }
 
-        int id = ((TextView) v).getId();
+        int id = v.getId();
         int need = get_need_type_from_id(id, id_to_need_map);
         if(need != IS_A_NEED && need != IS_NOT_A_NEED)
         {
+            Toast.makeText(this, "Could not find need type for view.", Toast.LENGTH_SHORT).show();
             return null;
         }
         purchase_item p = new purchase_item(
