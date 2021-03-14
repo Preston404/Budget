@@ -92,6 +92,8 @@ public class MainActivity extends AppCompatActivity
         //sql_db.execSQL("DROP TABLE IF EXISTS c0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER);");
 
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS f0(max_price DOUBLE, min_price DOUBLE, text VARCHAR, start_day INTEGER, end_day INTEGER, type INTEGER, sort INTEGER);");
+
         update_textviews();
 
         final TextView settings = findViewById(R.id.main_settings_title);
@@ -571,6 +573,7 @@ public class MainActivity extends AppCompatActivity
         return String.format(Locale.US,"Start Day: %d%s", day, suffix);
     }
 
+
     String get_suffix_for_day(int day)
     {
         String suffix = "th";
@@ -588,6 +591,7 @@ public class MainActivity extends AppCompatActivity
     {
         return String.format(Locale.US,"Amount: $%.2f", amount);
     }
+
 
     void set_text_size_for_child_views(LinearLayout parent_view)
     {
@@ -631,6 +635,7 @@ public class MainActivity extends AppCompatActivity
         return month_day;
     }
 
+
     String get_string_from_date(Date date)
     {
         // input = Sun Jan 31 13:17:48 PST 2021
@@ -648,6 +653,7 @@ public class MainActivity extends AppCompatActivity
         );
         return new_str;
     }
+
 
     void write_firebase(purchase_item p, final Context the_context, boolean wait)
     {
@@ -680,6 +686,7 @@ public class MainActivity extends AppCompatActivity
             db.waitForPendingWrites();
         }
     }
+
 
     Vector<purchase_item> read_firebase(Context the_context, purchase_item item_to_find, int filter)
     {

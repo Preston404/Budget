@@ -189,7 +189,7 @@ public class ListActivity extends MainActivity
         }
         else if (resultCode == GET_FILTER_RET_OK)
         {
-            hide_purchase_views(
+            apply_filter(
                     data.getExtras().getLong("day_start"),
                     data.getExtras().getLong("day_end"),
                     data.getExtras().getInt("needs"),
@@ -223,7 +223,7 @@ public class ListActivity extends MainActivity
         super.onBackPressed();
     }
 
-    void hide_purchase_views(
+    void apply_filter(
             long day_start,
             long day_end,
             int needs_filter,
@@ -233,26 +233,20 @@ public class ListActivity extends MainActivity
             int sort_price
     )
     {
-        Map<Integer, Integer> id_to_needs_map = get_id_to_needs_map();
-        // Skip over "Title", "Total", and "Button" views
-        for (int i = main_layout.getChildCount(); i > 2; i--)
+        Vector<purchase_item> purchases = get_all_purchases(needs_filter);
+        // Iterate backward so we don't mess up the indexes when we remove
+        // an element.
+        for (int i = purchases.size()-1; i>=0; i--)
         {
             boolean remove_it = false;
-
-            View child = main_layout.getChildAt(i);
-            purchase_item p = get_purchase_item_from_view((TextView) child, id_to_needs_map);
-            if(p == null){continue;}
-
-            long purchase_time =  get_ms_from_seconds(p.date);
-            if (needs_filter == FILTER_NEEDS_ONLY && p.need != IS_A_NEED)
+            purchase_item p = purchases.elementAt(i);
+            if (p == null)
             {
-                remove_it = true;
+                continue;
             }
-            else if (needs_filter == FILTER_WANTS_ONLY && p.need != IS_NOT_A_NEED)
-            {
-                remove_it = true;
-            }
-            else if (!filter_string.equals("") && !p.description.toLowerCase().contains(filter_string.toLowerCase()))
+
+            long purchase_time = get_ms_from_seconds(p.date);
+            if (!filter_string.equals("") && !p.description.toLowerCase().contains(filter_string.toLowerCase()))
             {
                 remove_it = true;
             }
@@ -272,53 +266,68 @@ public class ListActivity extends MainActivity
             {
                 remove_it = true;
             }
-
             if (remove_it)
             {
-                //
-                // main_layout.getChildAt(i).setVisibility(View.GONE);
-                main_layout.removeView(main_layout.getChildAt(i));
+                purchases.removeElementAt(i);
             }
         }
-        if(!SORT_OPTIONS[sort_price].contains("None"))
+        // Sort the purchases by price. Index zero will be the first
+        // purchase displayed, at top of list.
+        if (!SORT_OPTIONS[sort_price].contains("None"))
         {
-            // First three views are not purchase views
-            for (int i = main_layout.getChildCount(); i > 2; i--)
+            // Nested for loops go brrrrrr
+            for (int i = purchases.size()-1; i > 0; i--)
             {
-                // We look one ahead, so we don't need to iterate over the
+                boolean done_sorting = true;
+                // We look one ahead, so we can't iterate over the
                 // final purchase view.
-                for (int j = main_layout.getChildCount(); j > 3; j--)
+                for (int j = purchases.size()-1; j > 0; j--)
                 {
-                    purchase_item lower_view = get_purchase_item_from_view(
-                            (TextView) main_layout.getChildAt(j), id_to_needs_map
-                    );
-                    purchase_item upper_view = get_purchase_item_from_view(
-                            (TextView) main_layout.getChildAt(j-1), id_to_needs_map
-                    );
-                    if(lower_view == null || upper_view == null)
+                    purchase_item lower = purchases.elementAt(j);
+                    purchase_item upper = purchases.elementAt(j-1);
+                    if (lower == null || upper == null)
                     {
                         continue;
                     }
-                    if(SORT_OPTIONS[sort_price].contains("Max to Min") && upper_view.price < lower_view.price)
+                    if (SORT_OPTIONS[sort_price].contains("Max to Min") && upper.price < lower.price)
                     {
-                        // Save the view and remove it from the layout
-                        TextView temp = (TextView) main_layout.getChildAt(j);
-                        main_layout.removeViewAt(j);
-                        // Put the view back into the layout at a different position
-                        main_layout.addView(temp,j-1);
+                        purchase_item temp = purchases.elementAt(j);
+                        purchases.removeElementAt(j);
+                        purchases.insertElementAt(temp,j-1);
+                        done_sorting = false;
                     }
-                    else if(SORT_OPTIONS[sort_price].contains("Min to Max") && upper_view.price > lower_view.price)
+                    else if (SORT_OPTIONS[sort_price].contains("Min to Max") && upper.price > lower.price)
                     {
-                        // Save the view and remove it from the layout
-                        TextView temp = (TextView) main_layout.getChildAt(j);
-                        main_layout.removeViewAt(j);
-                        // Put the view back into the layout at a different position
-                        main_layout.addView(temp,j-1);
+                        purchase_item temp = purchases.elementAt(j);
+                        purchases.removeElementAt(j);
+                        purchases.insertElementAt(temp,j-1);
+                        done_sorting = false;
                     }
+                }
+                if (done_sorting)
+                {
+                    break;
                 }
             }
         }
 
+        // Remove purchase views, skip over "Title", "Total", and "Button" views
+        for (int i = main_layout.getChildCount(); i > 2; i--)
+        {
+            if (main_layout.getChildAt(i) != null)
+            {
+                main_layout.removeViewAt(i);
+            }
+        }
+        // Insert the filtered purchases
+        for (int i = 0; i < purchases.size(); i++)
+        {
+            if (purchases.elementAt(i) != null)
+            {
+                purchase_item p = purchases.elementAt(i);
+                main_layout.addView(create_purchase_view(p));
+            }
+        }
     }
 
     TextView create_purchase_view(purchase_item p)

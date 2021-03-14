@@ -168,6 +168,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
+                android:layout_margin="@dimen/button_margin"
+                android:background="@color/colorLightRed"
+                android:text="Clear Filter"
+                android:textSize="20pt"
+                android:id="@+id/filter_clear"
+                />
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
                 android:textSize="20pt"
                 android:layout_margin="@dimen/button_margin"
                 android:background="@color/colorLightGreen"
