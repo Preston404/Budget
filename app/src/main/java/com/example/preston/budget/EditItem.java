@@ -19,7 +19,7 @@ import java.util.Locale;
  * Created by Preston on 3/15/2020.
  */
 
-public class EditItem extends MainActivity {
+public class EditItem extends Utils {
     EditText item_price_edit_text;
     EditText item_description_edit_text;
     TextView item_date_text;

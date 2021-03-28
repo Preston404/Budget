@@ -18,7 +18,7 @@ import java.util.Locale;
  * Created by Preston on 3/15/2020.
  */
 
-public class AddItem extends MainActivity
+public class AddItem extends Utils
 {
     EditText item_price_edit_text = null;
     EditText item_description_edit_text = null;

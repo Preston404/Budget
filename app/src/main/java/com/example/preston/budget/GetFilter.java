@@ -33,7 +33,7 @@ import java.util.Map;
  * Created by Preston on 8/30/2020.
  */
 
-public class GetFilter extends MainActivity{
+public class GetFilter extends Utils{
     TextView start_day_text_view;
     TextView end_day_text_view;
     EditText string_edit_text;
@@ -64,6 +64,7 @@ public class GetFilter extends MainActivity{
         get_filter_button = findViewById(R.id.filter_purchases_button);
 
         init_views();
+        try_init_databases();
 
         // Parse inputs when we click submit
         get_filter_button.setOnClickListener(new View.OnClickListener(){

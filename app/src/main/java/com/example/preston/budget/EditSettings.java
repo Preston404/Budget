@@ -17,7 +17,7 @@ import java.util.Locale;
  * Created by Preston on 4/2/2020.
  */
 
-public class EditSettings extends MainActivity{
+public class EditSettings extends Utils{
     EditText goal_amount_edit_text;
     EditText goal_day_edit_text;
     EditText text_size_edit_text;

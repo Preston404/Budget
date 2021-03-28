@@ -14,7 +14,7 @@ import android.widget.Toast;
 import java.util.Date;
 import java.util.List;
 
-public class GetDate extends MainActivity {
+public class GetDate extends Utils {
     Button get_date_button;
     DatePicker date_picker;
     TimePicker time_picker;

@@ -24,7 +24,7 @@ import java.util.Calendar;
  * Created by Preston on 3/4/2020.
  */
 
-public class ListActivity extends MainActivity
+public class ListActivity extends Utils
 {
     LinearLayout main_layout = null;
     final Integer[] static_views = new Integer[]{R.id.list_view_total, R.id.list_add_item, R.id.list_title};
