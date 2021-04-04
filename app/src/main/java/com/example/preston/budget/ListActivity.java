@@ -234,6 +234,7 @@ public class ListActivity extends Utils
     )
     {
         Vector<purchase_item> purchases = get_all_purchases(needs_filter);
+        purchases = sort_purchases_newest_first(purchases);
         // Iterate backward so we don't mess up the indexes when we remove
         // an element.
         for (int i = purchases.size()-1; i>=0; i--)
