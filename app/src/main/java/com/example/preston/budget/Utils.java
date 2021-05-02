@@ -60,6 +60,7 @@ public class Utils extends AppCompatActivity
     final int WANTS_RET_OK = 73;
     final int EDIT_SETTINGS_RET_OK = 74;
     final int ALL_RET_OK = 75;
+    final int GRAPH_RET_OK = 76;
 
     purchase_item last_purchase_clicked;
     // The needs field in the database should really be stored

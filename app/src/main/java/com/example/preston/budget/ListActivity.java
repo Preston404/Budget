@@ -1,5 +1,6 @@
 package com.example.preston.budget;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
@@ -11,13 +12,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
-import java.util.Calendar;
 
 
 /**
@@ -28,6 +27,7 @@ public class ListActivity extends Utils
 {
     LinearLayout main_layout = null;
     final Integer[] static_views = new Integer[]{R.id.list_view_total, R.id.list_add_item, R.id.list_title};
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -37,6 +37,7 @@ public class ListActivity extends Utils
 
         main_layout = findViewById(R.id.list_main);
         list_view_type = getIntent().getExtras().getInt("list_view_type");
+        context = this;
 
         TextView list_title = findViewById(R.id.list_title);
         list_title.setPaintFlags(list_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -68,12 +69,38 @@ public class ListActivity extends Utils
                         @Override
                         public void onClick(View v)
                         {
-                Intent launchGetFilter = new Intent(v.getContext(), GetFilter.class);
-                int requested_code = GET_FILTER_RET_OK;
-                startActivityForResult(launchGetFilter, requested_code);
+                            Intent launchGetFilter = new Intent(v.getContext(), GetFilter.class);
+                            int requested_code = GET_FILTER_RET_OK;
+                            startActivityForResult(launchGetFilter, requested_code);
                         }
                     }
             );
+            Button graph_button = findViewById(R.id.list_graph);
+            graph_button.setOnClickListener(
+                    new View.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(View v)
+                        {
+                            Intent launchGraph = new Intent(v.getContext(), Graph.class);
+                            String graph_values = "";
+                            Vector<TextView> purchases_in_view = get_purchase_textviews();
+                            for(int i=0; i<purchases_in_view.size(); i++)
+                            {
+                                purchase_item p = get_purchase_item_from_view(purchases_in_view.elementAt(i),null);
+                                if(p != null)
+                                {
+                                    graph_values = graph_values.concat(((Double) p.price).toString());
+                                    graph_values = graph_values.concat(" ");
+                                }
+                            }
+                            launchGraph.putExtra("values", graph_values);
+                            int requested_code = GRAPH_RET_OK;
+                            startActivityForResult(launchGraph, requested_code);
+                        }
+                    }
+            );
+
             // Can't add purchases from ALL view
             main_layout.removeView(findViewById(R.id.list_add_item));
         }
@@ -92,8 +119,9 @@ public class ListActivity extends Utils
                     }
                 }
             );
-            // Only allow filtering from ALL view
+            // Only allow filtering and graphing from ALL view
             main_layout.removeView(findViewById(R.id.list_filter));
+            main_layout.removeView(findViewById(R.id.list_graph));
         }
     }
 
@@ -313,7 +341,13 @@ public class ListActivity extends Utils
         }
 
         // Remove purchase views, skip over "Title", "Total", and "Button" views
-        for (int i = main_layout.getChildCount(); i > 2; i--)
+        int num_views_to_skip = 3;
+        // Also skip GRAPH button if needed
+        if(list_view_type == ALL_LIST_VIEW)
+        {
+            num_views_to_skip++;
+        }
+        for (int i = main_layout.getChildCount(); i > (num_views_to_skip-1); i--)
         {
             if (main_layout.getChildAt(i) != null)
             {

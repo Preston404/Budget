@@ -28,6 +28,11 @@
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
+            android:name=".Graph"
+            android:label="Graph"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
             android:name=".AddItem"
             android:label="AddItem"
             android:theme="@style/AppTheme.NoActionBar">
