@@ -84,7 +84,7 @@ public class Utils extends AppCompatActivity
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");
         //sql_db.execSQL("DROP TABLE IF EXISTS c0;");
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER);");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER, show_remaining INTEGER);");
 
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS f0(max_price DOUBLE, min_price DOUBLE, text VARCHAR, start_day INTEGER, end_day INTEGER, type INTEGER, sort INTEGER);");
     }
@@ -93,13 +93,14 @@ public class Utils extends AppCompatActivity
     {
         // Always overwrite the previous table
         sql_db.execSQL("DROP TABLE IF EXISTS c0;");
-        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER);");
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER, show_remaining INTEGER);");
         String insert_cmd = String.format(
                 Locale.US,
-                "INSERT INTO c0 VALUES(%.2f, %d, %d);",
+                "INSERT INTO c0 VALUES(%.2f, %d, %d, %d);",
                 c.monthly_goal_amount,
                 c.start_day,
-                c.text_size
+                c.text_size,
+                c.show_remaining
         );
         sql_db.execSQL(insert_cmd);
     }
@@ -112,13 +113,25 @@ public class Utils extends AppCompatActivity
         if(!resultSet.moveToFirst())
         {
             // Config not found, return default config
-            settings_config c = new settings_config(800,25, 25);
+            settings_config c = new settings_config(
+                800,
+                25,
+                25,
+                1
+            );
             return c;
         }
+
         double monthly_goal_amount  = Double.parseDouble(resultSet.getString(0));
         int start_day = Integer.parseInt(resultSet.getString(1));
         int text_size = Integer.parseInt(resultSet.getString(2));
-        settings_config c = new settings_config(monthly_goal_amount, start_day, text_size);
+        int show_remaining = Integer.parseInt(resultSet.getString(3));
+        settings_config c = new settings_config(
+            monthly_goal_amount,
+            start_day,
+            text_size,
+            show_remaining
+        );
         return c;
     }
 
@@ -314,11 +327,19 @@ public class Utils extends AppCompatActivity
         double monthly_goal_amount = 0.0;
         int start_day = 25;
         int text_size = 25;
-        settings_config(double monthly_goal_amount, int start_day, int text_size)
+        int show_remaining = 1;
+
+        settings_config(
+            double monthly_goal_amount,
+            int start_day,
+            int text_size,
+            int show_remaining
+        )
         {
             this.monthly_goal_amount = monthly_goal_amount;
             this.start_day = start_day;
             this.text_size = text_size;
+            this.show_remaining = show_remaining;
         }
     }
 
@@ -420,32 +441,6 @@ public class Utils extends AppCompatActivity
     }
 
 
-    String get_monthly_start_day_string(int day)
-    {
-        String suffix = get_suffix_for_day(day);
-        return String.format(Locale.US,"Start Day: %d%s", day, suffix);
-    }
-
-
-    String get_suffix_for_day(int day)
-    {
-        String suffix = "th";
-        String[] suffix_exceptions = {"", "st", "nd", "rd"};
-        int day_mod = day % 10;
-        if(day_mod >= 1 && day_mod <= 3 && (day < 11 || day > 13))
-        {
-            suffix = suffix_exceptions[day_mod];
-        }
-        return suffix;
-    }
-
-
-    String get_monthly_goal_amount_string(double amount)
-    {
-        return String.format(Locale.US,"Amount: $%.2f", amount);
-    }
-
-
     void set_text_size_for_child_views(LinearLayout parent_view)
     {
         int size = read_settings_config_from_db().text_size;
@@ -488,6 +483,17 @@ public class Utils extends AppCompatActivity
         return month_day;
     }
 
+    String get_suffix_for_day(int day)
+    {
+        String suffix = "th";
+        String[] suffix_exceptions = {"", "st", "nd", "rd"};
+        int day_mod = day % 10;
+        if(day_mod >= 1 && day_mod <= 3 && (day < 11 || day > 13))
+        {
+            suffix = suffix_exceptions[day_mod];
+        }
+        return suffix;
+    }
 
     String get_string_from_date(Date date)
     {

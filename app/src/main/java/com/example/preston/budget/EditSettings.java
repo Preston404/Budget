@@ -72,12 +72,14 @@ public class EditSettings extends Utils{
                     Toast.makeText(context, "start day must be 28 or less", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                settings_config c = new settings_config(monthly_amount, start_day, text_size);
+                settings_config c = read_settings_config_from_db();
+                c.monthly_goal_amount = monthly_amount;
+                c.start_day = start_day;
+                c.text_size = text_size;
                 insert_config_into_db(c);
                 Intent intent = new Intent();
                 setResult(EDIT_SETTINGS_RET_OK, intent);
                 finish();
-
             }
         });
 

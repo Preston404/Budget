@@ -28,15 +28,19 @@ public class MainActivity extends Utils {
 
         update_textviews();
 
-        final TextView settings = findViewById(R.id.main_settings_title);
-        settings.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent launchSettings = new Intent(v.getContext(), EditSettings.class);
-                        startActivityForResult(launchSettings, EDIT_SETTINGS_RET_OK);
-                    }
+        // Stuff for Summary
+        final TextView summary = findViewById(R.id.main_summary_title);
+        summary.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // Toggle between showing summary for amount spent vs remaining
+                    settings_config c = read_settings_config_from_db();
+                    c.show_remaining = (c.show_remaining == 0) ? 1 : 0;
+                    insert_config_into_db(c);
+                    set_main_summary();
                 }
+            }
         );
 
         // Stuff for "needs"
@@ -78,6 +82,17 @@ public class MainActivity extends Utils {
                 }
         );
 
+        final TextView settings = findViewById(R.id.main_settings_title);
+        settings.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent launchSettings = new Intent(v.getContext(), EditSettings.class);
+                        startActivityForResult(launchSettings, EDIT_SETTINGS_RET_OK);
+                    }
+                }
+        );
+
         if (!this.authenticated) {
             do_authentication();
         }
@@ -110,8 +125,6 @@ public class MainActivity extends Utils {
         set_text_size_for_child_views((LinearLayout) findViewById(R.id.main_linear_layout));
 
         settings_config c = read_settings_config_from_db();
-        set_main_monthly_goal_amount(c.monthly_goal_amount);
-        set_main_monthly_start_day(c.start_day);
 
         TextView needs_total = findViewById(R.id.main_needs_amount);
         needs_total.setText(get_list_total_string(get_total_spent(FILTER_NEEDS_ONLY, PERIODS_THIS)));
@@ -119,38 +132,40 @@ public class MainActivity extends Utils {
         TextView wants_total = findViewById(R.id.main_wants_amount);
         wants_total.setText(get_list_total_string(get_total_spent(FILTER_WANTS_ONLY, PERIODS_THIS)));
 
+        set_main_summary();
+
+    }
+
+
+    void set_main_summary() {
+
+        settings_config c = read_settings_config_from_db();
         double spent = get_total_spent(FILTER_ALL, PERIODS_THIS);
-        set_main_remaining_amount(c.monthly_goal_amount - spent);
+        TextView t = findViewById(R.id.main_summary);
 
-        int days_remaining = get_days_until_day_of_month(c.start_day);
-        set_main_remaining_days(days_remaining);
-
-    }
-
-
-    void set_main_monthly_goal_amount(double d) {
-        TextView t = findViewById(R.id.main_monthly_budget_amount);
-        t.setText(get_monthly_goal_amount_string(d));
-    }
-
-
-    void set_main_monthly_start_day(int day) {
-        TextView t = findViewById(R.id.main_monthly_budget_start_day);
-        t.setText(get_monthly_start_day_string(day));
-    }
-
-
-    void set_main_remaining_amount(double amount) {
-        TextView t = findViewById(R.id.main_remaining_amount);
-        String text = String.format(Locale.US, "Amount: $%.2f", amount);
-        t.setText(text);
-    }
-
-
-    void set_main_remaining_days(int days) {
-        TextView t = findViewById(R.id.main_remaining_days);
-        String text = String.format(Locale.US, "Days: %d", days);
-        t.setText(text);
+        if(c.show_remaining != 0) // Show remaining amount
+        {
+            int days_remaining = get_days_until_day_of_month(c.start_day);
+            double dollars_remaining = c.monthly_goal_amount - spent;
+            String text = String.format(
+                    Locale.US,
+                    "Remaining:\n$%.2f and %d days",
+                    dollars_remaining,
+                    days_remaining
+            );
+            t.setText(text);
+        }
+        else // Show current spending
+        {
+            int days_passed = get_days_since_day_of_month(c.start_day);
+            String text = String.format(
+                    Locale.US,
+                    "Spent:\n$%.2f over %d days",
+                    spent,
+                    days_passed
+            );
+            t.setText(text);
+        }
     }
 
 

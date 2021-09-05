@@ -34,8 +34,8 @@
                 android:textSize="20pt"
                 android:background="@color/colorLightBlue"
                 android:textColor="@color/colorPrimaryDark"
-                android:text="REMAINING"
-                android:id="@+id/main_remaining_title"
+                android:text="SUMMARY"
+                android:id="@+id/main_summary_title"
                 />
             <TextView
                 android:layout_width="match_parent"
@@ -43,46 +43,8 @@
                 android:gravity="center"
                 android:textSize="20pt"
                 android:background="@color/colorWhite"
-                android:text="Amount: $0"
-                android:id="@+id/main_remaining_amount"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:background="@color/colorWhite"
-                android:text="Days: 0"
-                android:id="@+id/main_remaining_days"
-                />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:background="@color/colorLightBlue"
-                android:textColor="@color/colorPrimaryDark"
-                android:layout_margin="@dimen/button_margin"
-                android:text="Settings"
-                android:id="@+id/main_settings_title"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:background="@color/colorWhite"
-                android:text="Amount: $800"
-                android:id="@+id/main_monthly_budget_amount"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textSize="20pt"
-                android:background="@color/colorWhite"
-                android:text="Start: 25th"
-                android:id="@+id/main_monthly_budget_start_day"
+                android:text="Current:"
+                android:id="@+id/main_summary"
                 />
 
             <Button
@@ -135,6 +97,18 @@
                 android:layout_margin="@dimen/button_margin"
                 android:text="ALL"
                 android:id="@+id/all"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_margin="@dimen/button_margin"
+                android:text="Settings"
+                android:id="@+id/main_settings_title"
                 />
 
         </LinearLayout>
