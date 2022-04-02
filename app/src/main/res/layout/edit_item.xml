@@ -100,6 +100,23 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:background="@color/colorLightBlue"
+        android:text="Category"
+        android:textSize="20pt"
+        />
+    <Spinner
+        android:id="@+id/category_spinner"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20pt"
+
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:background="@color/colorLightGreen"
         android:layout_margin="@dimen/button_margin"
         android:text="Submit"

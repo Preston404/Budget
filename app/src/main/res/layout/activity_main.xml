@@ -107,6 +107,18 @@
                 android:background="@color/colorLightBlue"
                 android:textColor="@color/colorPrimaryDark"
                 android:layout_margin="@dimen/button_margin"
+                android:text="Categories"
+                android:id="@+id/main_categories_title"
+                />
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20pt"
+                android:background="@color/colorLightBlue"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_margin="@dimen/button_margin"
                 android:text="Settings"
                 android:id="@+id/main_settings_title"
                 />

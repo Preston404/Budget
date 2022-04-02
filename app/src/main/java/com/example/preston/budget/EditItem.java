@@ -4,15 +4,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -24,6 +30,7 @@ public class EditItem extends Utils {
     EditText item_description_edit_text;
     TextView item_date_text;
     ToggleButton toggle_button;
+    Spinner category_dropdown;
     int old_date;
     int new_date;
     Context context;
@@ -33,7 +40,7 @@ public class EditItem extends Utils {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_item);
         context = this;
-        set_text_size_for_child_views((LinearLayout) findViewById(R.id.edit_item));
+        settings_config c = set_text_size_for_child_views((LinearLayout) findViewById(R.id.edit_item));
         Bundle extra_data = getIntent().getExtras();
 
         TextView item_title = findViewById(R.id.edit_item_title);
@@ -58,6 +65,24 @@ public class EditItem extends Utils {
         new_date = old_date;
         item_date_text.setText(get_string_from_date(new Date(get_ms_from_seconds(old_date))));
 
+        //get the spinner from the xml.
+        category_dropdown = findViewById(R.id.category_spinner);
+        //create a list of items for the spinner.
+        List<String> categories_spinner = read_categories_from_db();
+        if(categories_spinner == null)
+        {
+            categories_spinner = new ArrayList<String>();
+            categories_spinner.add("");
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this,
+                R.layout.custom_spinner_view,
+                R.id.spinner_textview,
+                categories_spinner
+        );
+        category_dropdown.setAdapter(adapter);
+
         Button submit = findViewById(R.id.edit_submit_item);
         Button delete = findViewById(R.id.edit_delete_item);
         Button date_button = findViewById(R.id.edit_item_date_button);
@@ -68,9 +93,11 @@ public class EditItem extends Utils {
                 double new_price;
                 String new_description;
                 int new_view_type;
+                String new_category;
                 try {
                     new_price = Float.parseFloat(((EditText) item_price_edit_text).getText().toString());
                     new_description = ((EditText) item_description_edit_text).getText().toString();
+                    new_category = category_dropdown.getSelectedItem().toString();
                 } catch (Exception e) {
                     Toast.makeText(context, "Invalid Entry", Toast.LENGTH_SHORT).show();
                     return;
@@ -88,6 +115,7 @@ public class EditItem extends Utils {
                 Intent intent = new Intent();
                 intent.putExtra("price", new_price);
                 intent.putExtra("description", new_description);
+                intent.putExtra("category", new_category);
                 intent.putExtra("view_type", new_view_type);
                 intent.putExtra("date", new_date);
                 setResult(EDIT_ITEM_RET_OK, intent);

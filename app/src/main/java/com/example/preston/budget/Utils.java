@@ -4,9 +4,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -19,9 +22,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
@@ -105,7 +110,6 @@ public class Utils extends AppCompatActivity
         sql_db.execSQL(insert_cmd);
     }
 
-
     public settings_config read_settings_config_from_db()
     {
         try_init_databases();
@@ -133,6 +137,62 @@ public class Utils extends AppCompatActivity
             show_remaining
         );
         return c;
+    }
+
+    public void insert_category_into_db(String category)
+    {
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
+        String insert_cmd = String.format(
+                Locale.US,
+                "INSERT INTO categories VALUES(%s);",
+                category
+        );
+        sql_db.execSQL(insert_cmd);
+    }
+
+    public void remove_category_from_db(String category)
+    {
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
+        String delete_cmd = String.format(
+                Locale.US,
+                "DELETE FROM categories WHERE this_category = (%s);",
+                category
+        );
+        sql_db.execSQL(delete_cmd);
+    }
+
+    public List<String> read_categories_from_db()
+    {
+        sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
+        Cursor resultSet = sql_db.rawQuery("Select * from categories", null);
+        if(!resultSet.moveToFirst())
+        {
+            return null;
+        }
+        List<String> the_categories = new ArrayList<String>();
+        do
+        {
+            String a_category = resultSet.getString(0);
+            the_categories.add(a_category);
+        }
+        while(!resultSet.isLast());
+        return the_categories;
+    }
+
+    TextView create_spinner_category_view(String category, int text_size)
+    {
+        TextView t = new TextView(this);
+        t.setText(category);
+        t.setGravity(Gravity.CENTER);
+        t.setTextSize(text_size);
+        t.setLayoutParams(
+            new ViewGroup.LayoutParams
+            (
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        );
+        return t;
     }
 
     // The date doubles as the purchase ID, so we'll push the
@@ -242,6 +302,7 @@ public class Utils extends AppCompatActivity
         String description = "";
         double price = 0;
         String all_text = "N/A";
+        String category = "";
         try
         {
             // First char should be '$' so skip it
@@ -251,6 +312,11 @@ public class Utils extends AppCompatActivity
             String lines[] = all_text.split("\\r?\\n");
             price = Double.parseDouble(lines[0]);
             description = lines[1];
+
+            if (lines.length > 2)
+            {
+                category = lines[2];
+            }
         }
         catch (Exception e)
         {
@@ -282,7 +348,8 @@ public class Utils extends AppCompatActivity
                 price,
                 description,
                 id,
-                need
+                need,
+                category
         );
         return p;
     }
@@ -311,13 +378,15 @@ public class Utils extends AppCompatActivity
         String description = "Not Set";
         int date = 0;
         int need = 1;
+        String category = "";
 
-        purchase_item(double price, String description, int date, int need)
+        purchase_item(double price, String description, int date, int need, String category)
         {
             this.price = price;
             this.description = description;
             this.date = date;
             this.need = need;
+            this.category = category;
         }
     }
 
@@ -441,9 +510,10 @@ public class Utils extends AppCompatActivity
     }
 
 
-    void set_text_size_for_child_views(LinearLayout parent_view)
+    settings_config set_text_size_for_child_views(LinearLayout parent_view)
     {
-        int size = read_settings_config_from_db().text_size;
+        settings_config c = read_settings_config_from_db();
+        int size = c.text_size;
         int num_children = parent_view.getChildCount();
         for(int i = 0; i<num_children; i++)
         {
@@ -461,6 +531,7 @@ public class Utils extends AppCompatActivity
                 ((ToggleButton) child).setTextSize(size);
             }
         }
+        return c;
     }
 
 
@@ -601,11 +672,19 @@ public class Utils extends AppCompatActivity
 
     purchase_item get_purchase_item_from_doc(QueryDocumentSnapshot document)
     {
+        String category = "";
+        try
+        {
+            category = document.get("category").toString();
+        }
+        catch (Exception e) {};
+
         purchase_item ret = new purchase_item(
                 Double.parseDouble(document.get("price").toString()),
                 document.get("description").toString(),
                 Integer.parseInt(document.get("date").toString()),
-                Integer.parseInt(document.get("need").toString())
+                Integer.parseInt(document.get("need").toString()),
+                category
         );
         return ret;
     }

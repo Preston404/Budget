@@ -135,6 +135,7 @@ public class ListActivity extends Utils
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
             int date = get_seconds_from_ms((new Date()).getTime());
+            String category = data.getExtras().getString("category");
             int purchase_type = IS_A_NEED;
             if(list_view_type != NEEDS_LIST_VIEW)
             {
@@ -144,7 +145,8 @@ public class ListActivity extends Utils
                 price,
                 description,
                 date,
-                purchase_type
+                purchase_type,
+                category
             );
             int new_date = insert_purchase(p);
             // insert_purchase may adjust the date to make it unique
@@ -158,6 +160,7 @@ public class ListActivity extends Utils
             int id = last_purchase_clicked.date;
             double price = data.getExtras().getDouble("price");
             String description = data.getExtras().getString("description");
+            String category = data.getExtras().getString("category");
             // Convert the list view type returned to the need type... sigh
             Integer view_type = data.getExtras().getInt("view_type");
             Integer purchase_type = IS_A_NEED;
@@ -171,7 +174,8 @@ public class ListActivity extends Utils
                 price,
                 description,
                 date,
-                purchase_type
+                purchase_type,
+                category
             );
 
             // Update the database
@@ -495,12 +499,18 @@ public class ListActivity extends Utils
 
     String get_purchase_text(purchase_item p)
     {
-        return String.format(
+        String s = String.format(
             Locale.US,
             "$%.2f\n%s",
             p.price,
             p.description
         );
+        if(!p.category.equals(""))
+        {
+            s = s.concat("\n");
+            s = s.concat(p.category);
+        }
+        return s;
     }
 
     View.OnClickListener purchase_clicked = new View.OnClickListener()
@@ -521,6 +531,7 @@ public class ListActivity extends Utils
             launchAddItem.putExtra("description", p.description);
             launchAddItem.putExtra("need", p.need);
             launchAddItem.putExtra("date", p.date);
+            launchAddItem.putExtra("category", p.category);
             int requested_code = EDIT_ITEM_RET_OK;
             startActivityForResult(launchAddItem, requested_code);
             last_purchase_clicked = p;

@@ -3,78 +3,72 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/add_item"
     android:background="@color/colorWhite"
-    >
+    android:id="@+id/edit_settings">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:id="@+id/add_item_title"
+        android:textSize="20pt"
+        android:id="@+id/edit_categories_title"
         android:background="@color/colorPrimary"
         android:textColor="@color/colorWhite"
-        android:text="Purchase"
-        android:textSize="20pt"
+        android:text="Categories"
         />
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:background="@color/colorLightBlue"
-        android:text="Price"
         android:textSize="20pt"
+        android:background="@color/colorLightBlue"
+        android:text="Add Category"
         />
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20pt"
-        android:text=""
-        android:id="@+id/item_price"
+        android:id="@+id/goal_amount_edit_text"
+        android:text="None"
         />
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:background="@color/colorLightBlue"
-        android:text="Description"
         android:textSize="20pt"
-        />
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="20pt"
-        android:text=""
-        android:id="@+id/item_description"
-        />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@color/colorLightBlue"
-        android:text="Category"
-        android:textSize="20pt"
-        />
-    <Spinner
-        android:id="@+id/category_spinner"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:background="@color/colorLightGreen"
         android:layout_margin="@dimen/button_margin"
-        android:text="Submit"
+        android:background="@color/colorLightGreen"
+        android:id="@+id/edit_categories_add"
+        android:text="Add"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
         android:textSize="20pt"
-        android:id="@+id/submit_item"
+        android:background="@color/colorLightBlue"
+        android:text="Delete Category"
+        />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="20pt"
+        android:id="@+id/goal_day_edit_text"
+        android:text="None"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="@dimen/button_margin"
+        android:background="@color/colorLightRed"
+        android:text="Delete"
+        android:textSize="20pt"
+        android:id="@+id/edit_categories_delete"
         />
 
 </LinearLayout>
