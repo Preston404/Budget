@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorWhite"
-    android:id="@+id/edit_settings">
+    android:id="@+id/edit_categories">
 
     <TextView
         android:layout_width="match_parent"
@@ -29,8 +29,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20pt"
-        android:id="@+id/goal_amount_edit_text"
-        android:text="None"
+        android:id="@+id/add_category_edit_text"
+        android:text=""
         />
     <Button
         android:layout_width="match_parent"
@@ -51,13 +51,12 @@
         android:background="@color/colorLightBlue"
         android:text="Delete Category"
         />
-    <EditText
+    <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="20pt"
-        android:id="@+id/goal_day_edit_text"
-        android:text="None"
+        android:id="@+id/category_spinner_delete"
         />
 
     <Button

@@ -66,7 +66,7 @@ public class EditItem extends Utils {
         item_date_text.setText(get_string_from_date(new Date(get_ms_from_seconds(old_date))));
 
         //get the spinner from the xml.
-        category_dropdown = findViewById(R.id.category_spinner);
+        category_dropdown = findViewById(R.id.category_spinner_edit);
         //create a list of items for the spinner.
         List<String> categories_spinner = read_categories_from_db();
         if(categories_spinner == null)

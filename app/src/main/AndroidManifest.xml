@@ -57,6 +57,11 @@
             android:label="GetDate"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".Categories"
+            android:label="Categories"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
     </application>
 

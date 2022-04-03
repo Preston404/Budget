@@ -66,6 +66,7 @@ public class Utils extends AppCompatActivity
     final int EDIT_SETTINGS_RET_OK = 74;
     final int ALL_RET_OK = 75;
     final int GRAPH_RET_OK = 76;
+    final int EDIT_CATEGORIES_RET_OK = 77;
 
     purchase_item last_purchase_clicked;
     // The needs field in the database should really be stored
@@ -142,9 +143,20 @@ public class Utils extends AppCompatActivity
     public void insert_category_into_db(String category)
     {
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
+
+        List<String> current_categories = read_categories_from_db();
+        if(current_categories != null)
+        {
+            for (int i = 0; i < current_categories.size(); i++) {
+                if (current_categories.get(i).equals(category)) {
+                    return; // ALready in the db
+                }
+            }
+        }
+
         String insert_cmd = String.format(
                 Locale.US,
-                "INSERT INTO categories VALUES(%s);",
+                "INSERT INTO categories VALUES('%s');",
                 category
         );
         sql_db.execSQL(insert_cmd);
@@ -153,9 +165,10 @@ public class Utils extends AppCompatActivity
     public void remove_category_from_db(String category)
     {
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
+
         String delete_cmd = String.format(
                 Locale.US,
-                "DELETE FROM categories WHERE this_category = (%s);",
+                "DELETE FROM categories WHERE this_category='%s';",
                 category
         );
         sql_db.execSQL(delete_cmd);
@@ -174,25 +187,10 @@ public class Utils extends AppCompatActivity
         {
             String a_category = resultSet.getString(0);
             the_categories.add(a_category);
+            resultSet.moveToNext();
         }
-        while(!resultSet.isLast());
+        while(!resultSet.isAfterLast());
         return the_categories;
-    }
-
-    TextView create_spinner_category_view(String category, int text_size)
-    {
-        TextView t = new TextView(this);
-        t.setText(category);
-        t.setGravity(Gravity.CENTER);
-        t.setTextSize(text_size);
-        t.setLayoutParams(
-            new ViewGroup.LayoutParams
-            (
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        );
-        return t;
     }
 
     // The date doubles as the purchase ID, so we'll push the
@@ -216,7 +214,6 @@ public class Utils extends AppCompatActivity
 
     boolean db_contains_purchase_with_id(int id)
     {
-        boolean contains_id = false;
         Vector<purchase_item> purchases = read_firebase(this, null, FILTER_ALL);
         if(purchases.isEmpty())
         {
@@ -644,6 +641,7 @@ public class Utils extends AppCompatActivity
         purchase.put("price", p.price);
         purchase.put("date", p.date);
         purchase.put("need", p.need);
+        purchase.put("category", p.category);
 
         // Write/Overwrite a new document
         db.collection("purchases").document(Integer.toString(p.date))

@@ -105,12 +105,11 @@
         android:textSize="20pt"
         />
     <Spinner
-        android:id="@+id/category_spinner"
+        android:id="@+id/category_spinner_edit"
         android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20pt"
-
         />
 
     <Button

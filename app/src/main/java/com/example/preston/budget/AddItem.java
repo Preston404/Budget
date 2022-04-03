@@ -1,12 +1,10 @@
 package com.example.preston.budget;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,18 +46,20 @@ public class AddItem extends Utils {
 
 
         //get the spinner from the xml.
-        category_dropdown = findViewById(R.id.category_spinner);
+        category_dropdown = findViewById(R.id.category_spinner_add);
         //create a list of items for the spinner.
         List<String> categories_spinner = read_categories_from_db();
         if(categories_spinner == null)
         {
             categories_spinner = new ArrayList<String>();
-            categories_spinner.add("");
         }
+        // Set the first entry to the empty string
+        categories_spinner.add(0,"");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 this,
-                android.R.layout.simple_spinner_dropdown_item,
+                R.layout.custom_spinner_view,
+                R.id.spinner_textview,
                 categories_spinner
         );
         category_dropdown.setAdapter(adapter);

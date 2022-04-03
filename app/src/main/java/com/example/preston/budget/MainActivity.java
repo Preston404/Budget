@@ -93,16 +93,16 @@ public class MainActivity extends Utils {
                 }
         );
 
-        //final TextView categories = findViewById(R.id.main_categories_title);
-        /*categories.setOnClickListener(
+        final TextView categories = findViewById(R.id.main_categories_title);
+        categories.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent launchSettings = new Intent(v.getContext(), EditSettings.class);
-                        startActivityForResult(launchSettings, EDIT_SETTINGS_RET_OK);
+                        Intent launchSettings = new Intent(v.getContext(), Categories.class);
+                        startActivityForResult(launchSettings, EDIT_CATEGORIES_RET_OK);
                     }
                 }
-        );*/
+        );
 
         if (!this.authenticated) {
             do_authentication();
