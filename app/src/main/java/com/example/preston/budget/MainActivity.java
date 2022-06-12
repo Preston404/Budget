@@ -10,6 +10,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.google.type.DateTime;
+
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 
@@ -19,7 +22,7 @@ import androidx.core.content.ContextCompat;
 
 public class MainActivity extends Utils {
 
-    private boolean authenticated = false;
+    private Date authenticated_time = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +107,19 @@ public class MainActivity extends Utils {
                 }
         );
 
-        if (!this.authenticated) {
-            do_authentication();
-        }
+        do_authentication();
     }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Date now = new Date();
+        // getTime() returns milliseconds
+        if(now.getTime() - authenticated_time.getTime() > 60000)
+        {
+            do_authentication();
+        }
         if (resultCode == NEEDS_RET_OK) {
             double total = data.getExtras().getDouble("total");
             String text = String.format(Locale.US, "$%.2f", total);
@@ -202,7 +209,7 @@ public class MainActivity extends Utils {
                 super.onAuthenticationSucceeded(result);
                 Toast.makeText(getApplicationContext(),
                         "Authentication succeeded!", Toast.LENGTH_SHORT).show();
-                authenticated = true;
+                authenticated_time = new Date();
             }
 
             @Override

@@ -412,11 +412,8 @@ public class ListActivity extends Utils
             filter = FILTER_ALL;
         }
         Vector<purchase_item> purchase_items = get_all_purchases(filter);
+        purchase_items = filter_purchases_this_period(purchase_items);
         purchase_items = sort_purchases_newest_first(purchase_items);
-        if(filter != FILTER_ALL)
-        {
-            purchase_items = filter_purchases_this_period(purchase_items);
-        }
         while(purchase_items != null && !purchase_items.isEmpty())
         {
             int first_in_list = 0;

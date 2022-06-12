@@ -33,6 +33,8 @@ public class EditItem extends Utils {
     Spinner category_dropdown;
     int old_date;
     int new_date;
+    String old_category;
+    String new_category;
     Context context;
 
     @Override
@@ -42,6 +44,7 @@ public class EditItem extends Utils {
         context = this;
         settings_config c = set_text_size_for_child_views((LinearLayout) findViewById(R.id.edit_item));
         Bundle extra_data = getIntent().getExtras();
+        int select_spinner_index = 0;
 
         TextView item_title = findViewById(R.id.edit_item_title);
         item_title.setPaintFlags(item_title.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -63,6 +66,9 @@ public class EditItem extends Utils {
         }
         old_date = extra_data.getInt("date");
         new_date = old_date;
+        old_category = extra_data.getString("category");
+        new_category = old_category;
+
         item_date_text.setText(get_string_from_date(new Date(get_ms_from_seconds(old_date))));
 
         //get the spinner from the xml.
@@ -72,7 +78,16 @@ public class EditItem extends Utils {
         if(categories_spinner == null)
         {
             categories_spinner = new ArrayList<String>();
-            categories_spinner.add("");
+        }
+        // Put "N/A" at the front of the list, this will be the default
+        categories_spinner.add(0,"N/A");
+        for(int i=0; i<categories_spinner.size();i++)
+        {
+            if(categories_spinner.get(i).equals(old_category))
+            {
+                select_spinner_index = i;
+                break;
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -82,6 +97,7 @@ public class EditItem extends Utils {
                 categories_spinner
         );
         category_dropdown.setAdapter(adapter);
+        category_dropdown.setSelection(select_spinner_index);
 
         Button submit = findViewById(R.id.edit_submit_item);
         Button delete = findViewById(R.id.edit_delete_item);
@@ -93,11 +109,14 @@ public class EditItem extends Utils {
                 double new_price;
                 String new_description;
                 int new_view_type;
-                String new_category;
                 try {
                     new_price = Float.parseFloat(((EditText) item_price_edit_text).getText().toString());
                     new_description = ((EditText) item_description_edit_text).getText().toString();
                     new_category = category_dropdown.getSelectedItem().toString();
+                    if (new_category.equals("N/A"))
+                    {
+                        new_category = "";
+                    }
                 } catch (Exception e) {
                     Toast.makeText(context, "Invalid Entry", Toast.LENGTH_SHORT).show();
                     return;
