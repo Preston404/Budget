@@ -93,11 +93,13 @@ public class Utils extends AppCompatActivity
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER, show_remaining INTEGER);");
 
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS f0(max_price DOUBLE, min_price DOUBLE, text VARCHAR, start_day INTEGER, end_day INTEGER, type INTEGER, sort INTEGER);");
+        sql_db.close();
     }
 
     public void insert_config_into_db(settings_config c)
     {
         // Always overwrite the previous table
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         sql_db.execSQL("DROP TABLE IF EXISTS c0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS c0(monthly_goal_amount DOUBLE, start_day INTEGER, text_size INTEGER, show_remaining INTEGER);");
         String insert_cmd = String.format(
@@ -109,11 +111,13 @@ public class Utils extends AppCompatActivity
                 c.show_remaining
         );
         sql_db.execSQL(insert_cmd);
+        sql_db.close();
     }
 
     public settings_config read_settings_config_from_db()
     {
         try_init_databases();
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         Cursor resultSet = sql_db.rawQuery("Select * from c0", null);
         if(!resultSet.moveToFirst())
         {
@@ -124,6 +128,7 @@ public class Utils extends AppCompatActivity
                 25,
                 1
             );
+            sql_db.close();
             return c;
         }
 
@@ -137,11 +142,13 @@ public class Utils extends AppCompatActivity
             text_size,
             show_remaining
         );
+        sql_db.close();
         return c;
     }
 
     public void insert_category_into_db(String category)
     {
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
 
         List<String> current_categories = read_categories_from_db();
@@ -149,6 +156,7 @@ public class Utils extends AppCompatActivity
         {
             for (int i = 0; i < current_categories.size(); i++) {
                 if (current_categories.get(i).equals(category)) {
+                    sql_db.close();
                     return; // ALready in the db
                 }
             }
@@ -160,10 +168,12 @@ public class Utils extends AppCompatActivity
                 category
         );
         sql_db.execSQL(insert_cmd);
+        sql_db.close();
     }
 
     public void remove_category_from_db(String category)
     {
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
 
         String delete_cmd = String.format(
@@ -172,14 +182,18 @@ public class Utils extends AppCompatActivity
                 category
         );
         sql_db.execSQL(delete_cmd);
+        sql_db.close();
     }
 
     public List<String> read_categories_from_db()
     {
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS categories(this_category String);");
         Cursor resultSet = sql_db.rawQuery("Select * from categories", null);
         if(!resultSet.moveToFirst())
         {
+            resultSet.close();
+            sql_db.close();
             return null;
         }
         List<String> the_categories = new ArrayList<String>();
@@ -190,12 +204,171 @@ public class Utils extends AppCompatActivity
             resultSet.moveToNext();
         }
         while(!resultSet.isAfterLast());
+        resultSet.close();
+        sql_db.close();
         return the_categories;
+    }
+
+    public Vector<purchase_item> read_purchases_from_local_db(boolean this_period)
+    {
+        try_init_databases();
+        String sql_query = "Select * from t0";
+        if(this_period)
+        {
+            int seconds_since_start = get_seconds_since_period_start();
+            int lowest_num_seconds = get_seconds_from_ms(new Date().getTime()) - seconds_since_start;
+
+            sql_query = String.format(
+                Locale.US,
+                "Select * from t0 Where cast(date as INTEGER) > %d",
+                lowest_num_seconds
+            );
+
+        }
+
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
+        Cursor resultSet = sql_db.rawQuery(sql_query, null);
+        if(!resultSet.moveToFirst())
+        {
+            resultSet.close();
+            sql_db.close();
+            return null;
+        }
+        Vector<purchase_item> the_purchases = new Vector<purchase_item>();
+        do
+        {
+            double price  = Double.parseDouble(resultSet.getString(0));
+            String description = resultSet.getString(1);
+            int date = Integer.parseInt(resultSet.getString(2));
+            int need = Integer.parseInt(resultSet.getString(3));
+            String category = "";
+            purchase_item p = new purchase_item(
+                    price,
+                    description,
+                    date, // also the purchase ID
+                    need,
+                    category
+            );
+            the_purchases.add(p);
+            resultSet.moveToNext();
+        }
+        while(!resultSet.isAfterLast());
+        resultSet.close();
+        sql_db.close();
+        return the_purchases;
+    }
+
+    public boolean local_db_contains_purchase_id(int id)
+    {
+        try_init_databases();
+        boolean contains_id = false;
+
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
+        String sql_query = String.format(
+            Locale.US,
+            "Select * from t0 where cast(date as INTEGER) = %d",
+            id
+        );
+        Cursor resultSet = sql_db.rawQuery(sql_query, null);
+        if (resultSet.moveToFirst())
+        {
+            // An entry with this date/id is already present in the local db
+            contains_id = true;
+        }
+        else
+        {
+            Toast.makeText(this, "no purchase ID found.", Toast.LENGTH_LONG).show();
+        }
+        resultSet.close();
+        sql_db.close();
+        return contains_id;
+    }
+
+    public purchase_item read_purchase_item_from_local_db(int id)
+    {
+        try_init_databases();
+        purchase_item p = null;
+
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
+        String sql_query = String.format(
+            Locale.US,
+            "Select * from t0 Where cast(date as INTEGER) = %d",
+            id
+        );
+        Cursor resultSet = sql_db.rawQuery(sql_query, null);
+        if (resultSet.moveToFirst())
+        {
+            double price  = Double.parseDouble(resultSet.getString(0));
+            String description = resultSet.getString(1);
+            int date = Integer.parseInt(resultSet.getString(2));
+            int need = Integer.parseInt(resultSet.getString(3));
+            String category = "";
+            p = new purchase_item(
+                    price,
+                    description,
+                    date, // also the purchase ID
+                    need,
+                    category
+            );
+        }
+        resultSet.close();
+        sql_db.close();
+
+        return p;
+    }
+
+    public int insert_purchase_into_local_db(purchase_item p, boolean do_overwrite)
+    {
+        try_init_databases();
+
+        while(local_db_contains_purchase_id(p.date))
+        {
+            if(do_overwrite)
+            {
+                remove_purchase_from_local_db(p.date);
+                break;
+            }
+            else
+            {
+                // Push the date/ID field forward to make it unique.
+                p.date = p.date + 1;
+                Toast.makeText(this, "Purchase ID Adjusted", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
+        sql_db.execSQL(
+            "INSERT INTO t0 (price, description, date, needs) VALUES(?, ?, ?, ?);",
+            new Object[]
+                {
+                    p.price,
+                    p.description,
+                    p.date,
+                    p.need
+                }
+        );
+        sql_db.close();
+        return p.date;
+    }
+
+    public void remove_purchase_from_local_db(int id)
+    {
+        try_init_databases();
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
+
+        String delete_cmd = String.format(
+            Locale.US,
+            "DELETE FROM t0 WHERE date=%d",
+            id
+        );
+        sql_db.execSQL(delete_cmd);
+        sql_db.close();
     }
 
     // The date doubles as the purchase ID, so we'll push the
     // date forward a second if it is not unique. Returns the date
     // used as the ID
+    /*
     public int insert_purchase(purchase_item p)
     {
         boolean adjusted_date = false;
@@ -214,7 +387,8 @@ public class Utils extends AppCompatActivity
 
     boolean db_contains_purchase_with_id(int id)
     {
-        Vector<purchase_item> purchases = read_firebase(this, null, FILTER_ALL);
+        //Vector<purchase_item> purchases = read_firebase(this, null, FILTER_ALL);
+        Vector<purchase_item> purchases = read_purchases_from_local_db(false);
         if(purchases.isEmpty())
         {
             return false;
@@ -232,18 +406,38 @@ public class Utils extends AppCompatActivity
         }
         return false;
     }
+    */
 
-    public Vector<purchase_item> get_all_purchases(int filter_need)
+    public Vector<purchase_item> get_all_purchases(int filter, boolean filter_this_period)
     {
-        Vector<purchase_item> all_purchases = read_firebase(this, null, filter_need);
+        //Vector<purchase_item> all_purchases = read_firebase(this, null, filter_need);
+        Vector<purchase_item> all_purchases = read_purchases_from_local_db(filter_this_period);
         if (all_purchases.isEmpty())
         {
             all_purchases = null;
         }
-        return all_purchases;
+
+        Vector<purchase_item> filtered_purchases = new Vector<purchase_item>();
+        for(int i=0; i<all_purchases.size();i++) {
+            purchase_item this_purchase = all_purchases.elementAt(i);
+            if (filter == FILTER_NEEDS_ONLY && this_purchase.need == IS_A_NEED)
+            {
+                filtered_purchases.add(this_purchase);
+            }
+            else if (filter == FILTER_WANTS_ONLY && this_purchase.need == IS_NOT_A_NEED)
+            {
+                filtered_purchases.add(this_purchase);
+            }
+            else if (filter == FILTER_ALL)
+            {
+                filtered_purchases.add(this_purchase);
+            }
+        }
+        return filtered_purchases;
     }
 
 
+    /*
     public boolean remove_purchase_by_id(int id)
     {
         Task task = db.collection("purchases").document(Integer.toString(id)).delete();
@@ -255,46 +449,26 @@ public class Utils extends AppCompatActivity
         }
         return true;
     }
+    */
 
-    int get_need_type_from_id(int id, Map<Integer, Integer> id_to_need_map)
+    int get_need_type_from_id(int id, Map<Integer,Integer> id_to_needs_map)
     {
         int need = -1;
-        if(id_to_need_map != null)
+        if(id_to_needs_map != null && id_to_needs_map.containsKey(id))
         {
-            if (id_to_need_map.containsKey(id))
-            {
-                need = id_to_need_map.get(id);
-            }
-            else
-            {
-                Toast.makeText(this, "Map Does not contain ID", Toast.LENGTH_SHORT).show();
-            }
+            need = id_to_needs_map.get(id);
         }
         else
         {
-            // The date field doubles as an ID
-            Task task = db.collection("purchases").document(Integer.toString(id)).get();
-            while (!task.isComplete()){}
-            if (task.isSuccessful())
-            {
-                DocumentSnapshot doc = (DocumentSnapshot) task.getResult();
-                if (doc != null)
-                {
-                    need = Integer.parseInt(doc.get("need").toString());
-                }
+            purchase_item p = read_purchase_item_from_local_db(id);
+            if (p != null) {
+                need = p.need;
             }
-        }
-        if(need == -1 || (need != IS_A_NEED && need != IS_NOT_A_NEED))
-        {
-            Toast.makeText(this, "Could not find need tyep for id:", Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, String.format("%d", id), Toast.LENGTH_SHORT).show();
-            Toast.makeText(this, String.format("%d", need), Toast.LENGTH_SHORT).show();
-            need = -1;
         }
         return need;
     }
 
-    purchase_item get_purchase_item_from_view(TextView v, Map<Integer,Integer> id_to_need_map)
+    purchase_item get_purchase_item_from_view(TextView v, Map<Integer, Integer> id_to_needs_map)
     {
         String description = "";
         double price = 0;
@@ -303,8 +477,7 @@ public class Utils extends AppCompatActivity
         try
         {
             // First char should be '$' so skip it
-            all_text = (String) v.getText();
-            all_text = all_text.substring(1);
+            all_text = ((String) v.getText()).substring(1);
 
             String lines[] = all_text.split("\\r?\\n");
             price = Double.parseDouble(lines[0]);
@@ -329,13 +502,13 @@ public class Utils extends AppCompatActivity
             }
             else
             {
-                //Toast.makeText(this, "Error, Cannot convert null view", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Error, Cannot convert null view", Toast.LENGTH_SHORT).show();
             }
             return null;
         }
 
         int id = v.getId();
-        int need = get_need_type_from_id(id, id_to_need_map);
+        int need = get_need_type_from_id(id, id_to_needs_map);
         if(need != IS_A_NEED && need != IS_NOT_A_NEED)
         {
             Toast.makeText(this, "Could not find need type for view.", Toast.LENGTH_SHORT).show();
@@ -354,11 +527,8 @@ public class Utils extends AppCompatActivity
 
     double get_total_spent(int filter, int period)
     {
-        Vector<purchase_item> purchases = get_all_purchases(filter);
-        if (period == PERIODS_THIS)
-        {
-            purchases = filter_purchases_this_period(purchases);
-        }
+        Vector<purchase_item> purchases = get_all_purchases(filter, period == PERIODS_THIS);
+
         double total = 0;
         while(purchases != null && !purchases.isEmpty())
         {
@@ -473,6 +643,15 @@ public class Utils extends AppCompatActivity
         return purchases;
     }
 
+    int get_seconds_since_period_start()
+    {
+        Date d = new Date();
+        settings_config c = read_settings_config_from_db();
+        int seconds_today = ((new Date()).getHours()*3600) + ((new Date()).getMinutes()*60);
+        int days_since_start = get_days_since_day_of_month(c.start_day);
+        int seconds_since_start = days_since_start*seconds_in_a_day + seconds_today;
+        return seconds_since_start;
+    }
 
     Vector<purchase_item> filter_purchases_this_period(Vector<purchase_item> purchases)
     {
@@ -481,14 +660,12 @@ public class Utils extends AppCompatActivity
             return null;
         }
         Vector<purchase_item> purchases_this_month = new Vector<>();
-        settings_config c = read_settings_config_from_db();
-        int seconds_today = ((new Date()).getHours()*3600) + ((new Date()).getMinutes()*60);
         Date d = new Date();
-        int days_since_start = get_days_since_day_of_month(c.start_day);
-        int seconds_since_start = days_since_start*seconds_in_a_day + seconds_today;
+        int seconds_now = get_seconds_from_ms(d.getTime());
+        int seconds_since_start = get_seconds_since_period_start();
         for (int i = 0; i < purchases.size(); i++)
         {
-            if((get_seconds_from_ms(d.getTime()) - purchases.elementAt(i).date) < seconds_since_start)
+            if((seconds_now - purchases.elementAt(i).date) < seconds_since_start)
             {
                 purchases_this_month.add(purchases.elementAt(i));
             }

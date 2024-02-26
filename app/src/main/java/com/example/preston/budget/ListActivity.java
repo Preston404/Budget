@@ -85,9 +85,10 @@ public class ListActivity extends Utils
                             Intent launchGraph = new Intent(v.getContext(), Graph.class);
                             String graph_values = "";
                             Vector<TextView> purchases_in_view = get_purchase_textviews();
+                            Map<Integer, Integer> id_to_needs_map = get_id_to_needs_map();
                             for(int i=0; i<purchases_in_view.size(); i++)
                             {
-                                purchase_item p = get_purchase_item_from_view(purchases_in_view.elementAt(i),null);
+                                purchase_item p = get_purchase_item_from_view(purchases_in_view.elementAt(i), id_to_needs_map);
                                 if(p != null)
                                 {
                                     graph_values = graph_values.concat(((Double) p.price).toString());
@@ -148,7 +149,7 @@ public class ListActivity extends Utils
                 purchase_type,
                 category
             );
-            int new_date = insert_purchase(p);
+            int new_date = insert_purchase_into_local_db(p, false);
             // insert_purchase may adjust the date to make it unique
             p.date = new_date;
             int top_purchase_index = 3;
@@ -179,10 +180,11 @@ public class ListActivity extends Utils
             );
 
             // Update the database
-            if(remove_purchase_by_id(id))
+            //if(remove_purchase_by_id(id))
+            remove_purchase_from_local_db(p.date);
             {
                 // insert_purchase may adjust the date to make it unique
-                p.date = insert_purchase(p);
+                p.date = insert_purchase_into_local_db(p, false);
                 TextView t = findViewById(id);
                 if (view_type == list_view_type || ALL_LIST_VIEW == list_view_type)
                 {
@@ -201,23 +203,16 @@ public class ListActivity extends Utils
                 }
                 Toast.makeText(this, "Purchase Edited", Toast.LENGTH_SHORT).show();
             }
-            else
-            {
-                Toast.makeText(this, "Failed to Edit Purchase", Toast.LENGTH_SHORT).show();
-            }
         }
         else if (resultCode == EDIT_ITEM_RET_DELETE)
         {
             TextView t = findViewById(last_purchase_clicked.date);
-            if(remove_purchase_by_id(t.getId()))
+            remove_purchase_from_local_db(t.getId());
             {
                 ((ViewGroup) t.getParent()).removeView(t);
                 Toast.makeText(this, "Purchase Removed", Toast.LENGTH_SHORT).show();
             }
-            else
-            {
-                Toast.makeText(this, "Failed to Remove Purchase", Toast.LENGTH_SHORT).show();
-            }
+
         }
         else if (resultCode == GET_FILTER_RET_OK)
         {
@@ -265,7 +260,7 @@ public class ListActivity extends Utils
             int sort_price
     )
     {
-        Vector<purchase_item> purchases = get_all_purchases(needs_filter);
+        Vector<purchase_item> purchases = get_all_purchases(needs_filter, false);
         purchases = sort_purchases_newest_first(purchases);
         // Iterate backward so we don't mess up the indexes when we remove
         // an element.
@@ -403,6 +398,7 @@ public class ListActivity extends Utils
         double total = 0;
 
         int filter = FILTER_NEEDS_ONLY;
+        boolean filter_this_period = true;
         if (list_view_type == WANTS_LIST_VIEW)
         {
             filter = FILTER_WANTS_ONLY;
@@ -410,8 +406,9 @@ public class ListActivity extends Utils
         else if (list_view_type == ALL_LIST_VIEW)
         {
             filter = FILTER_ALL;
+            filter_this_period = false;
         }
-        Vector<purchase_item> purchase_items = get_all_purchases(filter);
+        Vector<purchase_item> purchase_items = get_all_purchases(filter, filter_this_period);
         purchase_items = filter_purchases_this_period(purchase_items);
         purchase_items = sort_purchases_newest_first(purchase_items);
         while(purchase_items != null && !purchase_items.isEmpty())
@@ -538,7 +535,8 @@ public class ListActivity extends Utils
     Map<Integer, Integer> get_id_to_needs_map()
     {
         Map<Integer, Integer> id_to_needs_map = new HashMap<Integer,Integer>();
-        Vector<purchase_item> purchases = read_firebase(this,null,FILTER_ALL);
+        //Vector<purchase_item> purchases = read_firebase(this,null,FILTER_ALL);
+        Vector<purchase_item> purchases = read_purchases_from_local_db(false);
         for(purchase_item item : purchases)
         {
             id_to_needs_map.put(item.date, item.need);

@@ -13,7 +13,9 @@ import android.widget.Toast;
 import com.google.type.DateTime;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.Vector;
 import java.util.concurrent.Executor;
 
 import androidx.annotation.NonNull;
@@ -108,6 +110,11 @@ public class MainActivity extends Utils {
         );
 
         do_authentication();
+
+        List<purchase_item> local_purchases = read_purchases_from_local_db(true);
+        String msg = String.format("Local size: %d", local_purchases.size());
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+
     }
 
 
@@ -116,9 +123,9 @@ public class MainActivity extends Utils {
         super.onActivityResult(requestCode, resultCode, data);
         Date now = new Date();
         // getTime() returns milliseconds
-        if(now.getTime() - authenticated_time.getTime() > 60000)
+        //if(now.getTime() - authenticated_time.getTime() > 60000)
         {
-            do_authentication();
+            //do_authentication();
         }
         if (resultCode == NEEDS_RET_OK) {
             double total = data.getExtras().getDouble("total");
