@@ -112,9 +112,6 @@ public class MainActivity extends Utils {
         do_authentication();
 
         List<purchase_item> local_purchases = read_purchases_from_local_db(true);
-        String msg = String.format("Local size: %d", local_purchases.size());
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-
     }
 
 

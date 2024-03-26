@@ -279,7 +279,7 @@ public class Utils extends AppCompatActivity
         }
         else
         {
-            Toast.makeText(this, "no purchase ID found.", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "no purchase ID found.", Toast.LENGTH_LONG).show();
         }
         resultSet.close();
         sql_db.close();
