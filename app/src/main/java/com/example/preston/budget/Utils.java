@@ -212,6 +212,8 @@ public class Utils extends AppCompatActivity
     public Vector<purchase_item> read_purchases_from_local_db(boolean this_period)
     {
         try_init_databases();
+        Vector<purchase_item> the_purchases = new Vector<purchase_item>();
+
         String sql_query = "Select * from t0";
         if(this_period)
         {
@@ -232,9 +234,9 @@ public class Utils extends AppCompatActivity
         {
             resultSet.close();
             sql_db.close();
-            return null;
+            return the_purchases;
         }
-        Vector<purchase_item> the_purchases = new Vector<purchase_item>();
+
         do
         {
             double price  = Double.parseDouble(resultSet.getString(0));
@@ -412,10 +414,6 @@ public class Utils extends AppCompatActivity
     {
         //Vector<purchase_item> all_purchases = read_firebase(this, null, filter_need);
         Vector<purchase_item> all_purchases = read_purchases_from_local_db(filter_this_period);
-        if (all_purchases.isEmpty())
-        {
-            all_purchases = null;
-        }
 
         Vector<purchase_item> filtered_purchases = new Vector<purchase_item>();
         for(int i=0; i<all_purchases.size();i++) {
