@@ -86,6 +86,7 @@ public class Utils extends AppCompatActivity
 
     public void try_init_databases()
     {
+
         sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         //sql_db.execSQL("DROP TABLE IF EXISTS t0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS t0(price DOUBLE, description VARCHAR, date INTEGER, needs INTEGER);");

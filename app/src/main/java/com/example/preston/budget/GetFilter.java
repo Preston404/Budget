@@ -324,11 +324,14 @@ public class GetFilter extends Utils{
 
     filter_config read_filter_from_db()
     {
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         Cursor resultSet = sql_db.rawQuery("Select * from f0", null);
+
         filter_config f = new filter_config();
         if(!resultSet.moveToFirst())
         {
             // Config not found, return default config
+            sql_db.close();
             return new filter_config();
         }
         try {
@@ -344,12 +347,14 @@ public class GetFilter extends Utils{
         {
             Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
         }
+        sql_db.close();
         return f;
     }
 
     void insert_filter_into_db(filter_config f)
     {
         // Always overwrite the previous table
+        sql_db = openOrCreateDatabase(db_name, MODE_PRIVATE, null);
         sql_db.execSQL("DROP TABLE IF EXISTS f0;");
         sql_db.execSQL("CREATE TABLE IF NOT EXISTS f0(max_price DOUBLE, min_price DOUBLE, text VARCHAR, start_day INTEGER, end_day INTEGER, type INTEGER, sort INTEGER);");
         String insert_cmd = String.format(
@@ -364,6 +369,7 @@ public class GetFilter extends Utils{
                 f.sort
         );
         sql_db.execSQL(insert_cmd);
+        sql_db.close();
     }
 
 
