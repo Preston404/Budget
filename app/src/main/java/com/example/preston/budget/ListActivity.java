@@ -179,9 +179,8 @@ public class ListActivity extends Utils
                 category
             );
 
-            // Update the database
-            //if(remove_purchase_by_id(id))
-            remove_purchase_from_local_db(p.date);
+            // Delete the old version of this purchase item
+            remove_purchase_from_local_db(id);
             {
                 // insert_purchase may adjust the date to make it unique
                 p.date = insert_purchase_into_local_db(p, false);
@@ -406,10 +405,8 @@ public class ListActivity extends Utils
         else if (list_view_type == ALL_LIST_VIEW)
         {
             filter = FILTER_ALL;
-            filter_this_period = false;
         }
         Vector<purchase_item> purchase_items = get_all_purchases(filter, filter_this_period);
-        purchase_items = filter_purchases_this_period(purchase_items);
         purchase_items = sort_purchases_newest_first(purchase_items);
         while(purchase_items != null && !purchase_items.isEmpty())
         {
@@ -527,8 +524,8 @@ public class ListActivity extends Utils
             launchAddItem.putExtra("date", p.date);
             launchAddItem.putExtra("category", p.category);
             int requested_code = EDIT_ITEM_RET_OK;
-            startActivityForResult(launchAddItem, requested_code);
             last_purchase_clicked = p;
+            startActivityForResult(launchAddItem, requested_code);
         }
     };
 
